@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ code }} | {{ title }}</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        /* Dark Theme Styles (Default) */
+        body.theme-dark {
+            background: #0a0a0f;
+            color: #e5e5e5;
+        }
+        body.theme-dark .container {
+            border: 1px solid rgba(232,82,14,0.15);
+            background: rgba(232,82,14,0.03);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        }
+        body.theme-dark .error-title {
+            color: #fff;
+        }
+        body.theme-dark .error-message {
+            color: #999;
+        }
+        body.theme-dark .logo {
+            filter: drop-shadow(0 0 16px rgba(232,82,14,0.4));
+        }
+        body.theme-dark .orb-1 {
+            background: radial-gradient(circle, rgba(232,82,14,0.1) 0%, transparent 70%);
+        }
+        body.theme-dark .orb-2 {
+            background: radial-gradient(circle, rgba(232,82,14,0.08) 0%, transparent 70%);
+        }
+
+        /* Light Theme Styles */
+        body.theme-light {
+            background: #f8f9fa;
+            color: #1e293b;
+        }
+        body.theme-light .container {
+            border: 1px solid rgba(232,82,14,0.2);
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 20px 50px rgba(232,82,14,0.05);
+        }
+        body.theme-light .error-title {
+            color: #0f172a;
+        }
+        body.theme-light .error-message {
+            color: #475569;
+        }
+        body.theme-light .logo {
+            filter: drop-shadow(0 0 12px rgba(232,82,14,0.25));
+        }
+        body.theme-light .orb-1 {
+            background: radial-gradient(circle, rgba(232,82,14,0.05) 0%, transparent 70%);
+        }
+        body.theme-light .orb-2 {
+            background: radial-gradient(circle, rgba(232,82,14,0.03) 0%, transparent 70%);
+        }
+
+        /* Animated Background Orbs */
+        .orb-1 {
+            position: absolute; top: -15%; left: -10%;
+            width: 600px; height: 600px; border-radius: 50%;
+            filter: blur(80px); pointer-events: none; z-index: 0;
+            animation: float1 8s ease-in-out infinite;
+        }
+        .orb-2 {
+            position: absolute; bottom: -15%; right: -10%;
+            width: 500px; height: 500px; border-radius: 50%;
+            filter: blur(80px); pointer-events: none; z-index: 0;
+            animation: float2 10s ease-in-out infinite;
+        }
+        /* Subtle Grid Pattern */
+        .grid-pattern {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(232,82,14,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(232,82,14,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none; z-index: 0;
+        }
+        .container {
+            max-width: 500px;
+            width: 90%;
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+        .error-code {
+            font-size: 6rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #e8520e, #ff8c42, #e8520e);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+            margin-bottom: 12px;
+            animation: gradientShift 4s ease infinite;
+        }
+        .error-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+        .error-message {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 28px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #e8520e, #d4470b);
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(232,82,14,0.3);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(232,82,14,0.45);
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Control Panel */
+        .control-panel {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px;
+            border-radius: 12px;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        .control-panel button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        #theme-icon-sun, #theme-icon-moon, #fs-icon-expand, #fs-icon-compress {
+            display: none;
+        }
+        body.theme-dark .control-panel {
+            background: rgba(15, 15, 23, 0.6);
+            border: 1px solid rgba(232, 82, 14, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        body.theme-light .control-panel {
+            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        body.theme-dark .control-panel button {
+            color: #ccc;
+        }
+        body.theme-light .control-panel button {
+            color: #475569;
+        }
+        body.theme-dark .control-panel button:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        body.theme-light .control-panel button:hover {
+            background: rgba(0,0,0,0.05);
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, 15px) scale(1.05); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-15px, -20px) scale(1.08); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme & Fullscreen Controls -->
+    <div class="control-panel">
+        <button id="theme-toggle" title="Toggle Tema">
+            <i class="fa-solid fa-sun" id="theme-icon-sun"></i>
+            <i class="fa-solid fa-moon" id="theme-icon-moon"></i>
+        </button>
+        <button id="fullscreen-toggle" title="Layar Penuh">
+            <i class="fa-solid fa-expand" id="fs-icon-expand"></i>
+            <i class="fa-solid fa-compress" id="fs-icon-compress"></i>
+        </button>
+    </div>
+
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="grid-pattern"></div>
+
+    <div class="container">
+        <div class="logo-container">
+            <img class="logo" src="/logo.png" alt="RustBasic Logo">
+        </div>
+        <div class="error-code">{{ code }}</div>
+        <h2 class="error-title">{{ title }}</h2>
+        <p class="error-message">
+            {{ message }}
+        </p>
+        <a href="/" class="btn">KEMBALI KE BERANDA</a>
+    </div>
+
+    <script>
+        // Setup initial theme dynamically before rendering fully
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.body.classList.add('theme-' + savedTheme);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const body = document.body;
+            const themeToggle = document.getElementById('theme-toggle');
+            const fsToggle = document.getElementById('fullscreen-toggle');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+            const expandIcon = document.getElementById('fs-icon-expand');
+            const compressIcon = document.getElementById('fs-icon-compress');
+
+            function updateThemeUI() {
+                const isDark = body.classList.contains('theme-dark');
+                if (isDark) {
+                    sunIcon.style.display = 'inline-block';
+                    sunIcon.style.color = '#fbbf24';
+                    moonIcon.style.display = 'none';
+                } else {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'inline-block';
+                    moonIcon.style.color = '#475569';
+                }
+            }
+
+            function updateFullscreenUI() {
+                const isFS = !!document.fullscreenElement;
+                if (isFS) {
+                    expandIcon.style.display = 'none';
+                    compressIcon.style.display = 'inline-block';
+                } else {
+                    expandIcon.style.display = 'inline-block';
+                    compressIcon.style.display = 'none';
+                }
+            }
+
+            themeToggle.addEventListener('click', () => {
+                if (body.classList.contains('theme-dark')) {
+                    body.classList.remove('theme-dark');
+                    body.classList.add('theme-light');
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    body.classList.remove('theme-light');
+                    body.classList.add('theme-dark');
+                    localStorage.setItem('theme', 'dark');
+                }
+                updateThemeUI();
+            });
+
+            fsToggle.addEventListener('click', () => {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.error('Error enabling fullscreen:', err);
+                    });
+                } else {
+                    document.exitFullscreen();
+                }
+            });
+
+            document.addEventListener('fullscreenchange', updateFullscreenUI);
+
+            updateThemeUI();
+            updateFullscreenUI();
+        });
+    </script>
+</body>
+</html>

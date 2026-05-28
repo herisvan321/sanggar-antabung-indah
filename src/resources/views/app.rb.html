@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RustBasic - Framework web full-stack modern berkinerja tinggi berbasis Rust (Custom HTTP Engine) dan React.js">
+    <meta name="keywords" content="rust, rustbasic, web framework, react, inertia, spa, web development">
+    <meta name="author" content="RustBasic">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>RustBasic - React + Inertia SPA</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for Premium Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Assets dari Vite -->
+    {{ vite_assets | safe }}
+    
+    <style>
+        /* Smooth transitions & dark mode base styling */
+        html, body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        /* Hide scrollbars during transitions */
+        body {
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body>
+    <!-- App Container Inertia -->
+    <div id="app" data-page='{{ page | tojson | safe }}'></div>
+</body>
+</html>

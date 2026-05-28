@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetroAdmin - Dashboard Klasik</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variabel Warna Retro */
+        :root {
+            --bg-dark: #120458;
+            --bg-darker: #0b0233;
+            --neon-pink: #ff00ff;
+            --neon-cyan: #00f2ff;
+            --neon-yellow: #fff200;
+            --text-color: #ffffff;
+            --grid-line: rgba(255, 0, 255, 0.2);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Mono', monospace;
+        }
+
+        body {
+            background-color: var(--bg-darker);
+            color: var(--text-color);
+            background-image: 
+                linear-gradient(var(--grid-line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+            background-size: 40px 40px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- NAVIGATION TOP --- */
+        .nav-top {
+            height: 70px;
+            background: var(--bg-dark);
+            border-bottom: 3px solid var(--neon-pink);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        .logo {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            text-shadow: 3px 3px var(--neon-pink);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .nav-search {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-cyan);
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            width: 300px;
+        }
+
+        .nav-search input {
+            background: transparent;
+            border: none;
+            color: white;
+            outline: none;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .avatar-box {
+            width: 35px;
+            height: 35px;
+            background: var(--neon-yellow);
+            border: 2px solid var(--text-color);
+            box-shadow: 2px 2px 0 var(--neon-pink);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 240px;
+            background: var(--bg-dark);
+            height: calc(100vh - 70px);
+            position: fixed;
+            left: 0;
+            top: 70px;
+            border-right: 2px solid var(--neon-cyan);
+            padding: 2rem 1rem;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 12px 15px;
+            color: var(--text-color);
+            text-decoration: none;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background: var(--neon-pink);
+            border-color: var(--neon-cyan);
+            box-shadow: 4px 4px 0 var(--neon-cyan);
+            transform: translate(-2px, -2px);
+            color: white;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 240px;
+            margin-top: 70px;
+            padding: 2rem;
+        }
+
+        /* Navigasi Logic: Sembunyikan halaman yang tidak aktif */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-content {
+            margin-bottom: 2rem;
+        }
+
+        .header-content h1 {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.5rem;
+            color: var(--neon-yellow);
+            text-shadow: 2px 2px var(--neon-pink);
+        }
+
+        /* --- GRID CARDS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .card {
+            background: rgba(11, 2, 51, 0.8);
+            border: 2px solid var(--neon-cyan);
+            padding: 1.5rem;
+            position: relative;
+            box-shadow: 6px 6px 0 rgba(0, 242, 255, 0.2);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 10px;
+            height: 10px;
+            background: var(--neon-pink);
+        }
+
+        .card-title {
+            font-size: 0.75rem;
+            color: var(--neon-pink);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .card-value {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        /* --- DATA TABLE --- */
+        .table-container {
+            background: var(--bg-dark);
+            border: 2px solid var(--neon-pink);
+            overflow-x: auto;
+            box-shadow: 8px 8px 0 rgba(255, 0, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: var(--neon-pink);
+            color: white;
+            padding: 12px 15px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--grid-line);
+            font-size: 0.85rem;
+        }
+
+        tr:hover {
+            background: rgba(255, 0, 255, 0.1);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            border: 1px solid;
+        }
+
+        .status-online { color: var(--neon-cyan); border-color: var(--neon-cyan); }
+        .status-offline { color: var(--neon-pink); border-color: var(--neon-pink); }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            .sidebar .menu-item span {
+                display: none;
+            }
+            .main-content {
+                margin-left: 70px;
+            }
+            .nav-search {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navigation -->
+    <nav class="nav-top">
+        <a href="javascript:void(0)" onclick="navigateTo('dashboard')" class="logo">RETRO_OS</a>
+        
+        <div class="nav-search">
+            <input type="text" placeholder="Cari data system...">
+        </div>
+
+        <div class="nav-actions">
+            <div class="user-profile">
+                <span style="font-size: 0.8rem;">ADMIN_USER</span>
+                <div class="avatar-box"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="mainSidebar">
+        <a href="javascript:void(0)" class="menu-item active" data-page="dashboard" onclick="navigateTo('dashboard')"><span>> DASBOR</span></a>
+        <a href="javascript:void(0)" class="menu-item" data-page="pengguna" onclick="navigateTo('pengguna')"><span>> PENGGUNA</span></a>
+        <a href="javascript:void(0)" class="menu-item" data-page="datalog" onclick="navigateTo('datalog')"><span>> DATA_LOG</span></a>
+        <a href="javascript:void(0)" class="menu-item" data-page="statistik" onclick="navigateTo('statistik')"><span>> STATISTIK</span></a>
+        <a href="javascript:void(0)" class="menu-item" data-page="setelan" onclick="navigateTo('setelan')"><span>> SETELAN</span></a>
+        <div style="margin-top: 50px;">
+            <a href="javascript:void(0)" class="menu-item" style="color: var(--neon-pink);" onclick="showLogoutAlert()"><span>[ KELUAR ]</span></a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- HALAMAN: DASHBOARD -->
+        <div id="page-dashboard" class="page active">
+            <div class="header-content">
+                <h1>SISTEM KONTROL PUSAT</h1>
+                <p style="color: var(--neon-cyan); font-size: 0.8rem; margin-top: 5px;">Status: Online | Versi: 1.9.84</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="card">
+                    <div class="card-title">Total Memori</div>
+                    <div class="card-value">640 KB</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">User Aktif</div>
+                    <div class="card-value">1,204</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Uptime System</div>
+                    <div class="card-value">99.9%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Ancaman</div>
+                    <div class="card-value">0</div>
+                </div>
+            </div>
+
+            <h2 style="margin-bottom: 1rem; font-size: 1rem; color: var(--neon-pink);">LOG AKTIVITAS TERBARU</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID_PROSES</th>
+                            <th>PENGGUNA</th>
+                            <th>AKSI</th>
+                            <th>WAKTU</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>#PX-001</td><td>NeonRider</td><td>Login ke System</td><td>12:45:01</td><td><span class="status-badge status-online">BERHASIL</span></td></tr>
+                        <tr><td>#PX-002</td><td>CyberPunk88</td><td>Update Database</td><td>12:50:22</td><td><span class="status-badge status-online">BERHASIL</span></td></tr>
+                        <tr><td>#PX-003</td><td>Stranger_84</td><td>Akses Ilegal</td><td>13:05:10</td><td><span class="status-badge status-offline">DITOLAK</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- HALAMAN: PENGGUNA -->
+        <div id="page-pengguna" class="page">
+            <div class="header-content">
+                <h1>MANAJEMEN PENGGUNA</h1>
+                <p style="color: var(--neon-cyan); font-size: 0.8rem; margin-top: 5px;">Mengelola akses identitas digital.</p>
+            </div>
+            <div class="card" style="margin-bottom: 2rem;">
+                <p style="color: var(--neon-yellow);">Memuat daftar pengguna dari server pusat...</p>
+                <div style="margin-top: 15px; border: 1px dashed var(--neon-cyan); padding: 10px;">
+                    [INFO] 5 User ditemukan dalam database.
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN: DATA LOG -->
+        <div id="page-datalog" class="page">
+            <div class="header-content">
+                <h1>DATA_LOG SYSTEM</h1>
+                <p style="color: var(--neon-cyan); font-size: 0.8rem; margin-top: 5px;">Rekaman transaksi kernel terenkripsi.</p>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>MODUL</th>
+                            <th>PESAN_ERROR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>2024-05-20 14:00</td><td>KERNEL</td><td>No error detected.</td></tr>
+                        <tr><td>2024-05-20 14:05</td><td>NETWORK</td><td>Ping to mainframe: 5ms.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- HALAMAN: STATISTIK -->
+        <div id="page-statistik" class="page">
+            <div class="header-content">
+                <h1>STATISTIK ANALITIK</h1>
+                <p style="color: var(--neon-cyan); font-size: 0.8rem; margin-top: 5px;">Visualisasi data performa mainframe.</p>
+            </div>
+            <div style="height: 200px; border: 2px solid var(--neon-pink); display: flex; align-items: flex-end; gap: 10px; padding: 20px;">
+                <div style="flex: 1; background: var(--neon-cyan); height: 40%;"></div>
+                <div style="flex: 1; background: var(--neon-pink); height: 80%;"></div>
+                <div style="flex: 1; background: var(--neon-yellow); height: 60%;"></div>
+                <div style="flex: 1; background: var(--neon-cyan); height: 95%;"></div>
+            </div>
+            <p style="text-align: center; margin-top: 10px; font-size: 0.7rem;">GRAFIK UTILISASI CPU (%)</p>
+        </div>
+
+        <!-- HALAMAN: SETELAN -->
+        <div id="page-setelan" class="page">
+            <div class="header-content">
+                <h1>KONFIGURASI SYSTEM</h1>
+                <p style="color: var(--neon-cyan); font-size: 0.8rem; margin-top: 5px;">Ubah parameter operasional RETRO_OS.</p>
+            </div>
+            <div class="card">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 5px;">NAMA_SISTEM:</label>
+                    <input type="text" value="RETRO_OS_V1" style="background: black; color: var(--neon-cyan); border: 1px solid var(--neon-cyan); padding: 5px; width: 100%;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 0.8rem; margin-bottom: 5px;">PROTOKOL_KEAMANAN:</label>
+                    <select style="background: black; color: var(--neon-pink); border: 1px solid var(--neon-pink); padding: 5px; width: 100%;">
+                        <option>MAINFRAME_ENCRYPTION</option>
+                        <option>LEGACY_PASS</option>
+                    </select>
+                </div>
+                <button style="background: var(--neon-cyan); border: none; padding: 10px 20px; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; cursor: pointer;">SIMPAN</button>
+            </div>
+        </div>
+
+        <footer style="margin-top: 3rem; text-align: center; color: rgba(255,255,255,0.3); font-size: 0.7rem;">
+            &copy; 1984 RETRO_OS CORP. SEMUA HAK DILINDUNGI.
+        </footer>
+    </main>
+
+    <!-- JavaScript Navigasi -->
+    <script>
+        function navigateTo(pageId) {
+            // 1. Sembunyikan semua halaman
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // 2. Tampilkan halaman yang dipilih
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // 3. Update status active di sidebar
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('data-page') === pageId) {
+                    item.classList.add('active');
+                }
+            });
+
+            // 4. Scroll ke atas (opsional)
+            window.scrollTo(0, 0);
+            
+            console.log("Navigasi ke: " + pageId.toUpperCase());
+        }
+
+        function showLogoutAlert() {
+            const confirmLogout = confirm("Apakah Anda yakin ingin mematikan koneksi terminal?");
+            if (confirmLogout) {
+                document.body.innerHTML = `
+                    <div style="background: black; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--neon-pink); font-family: 'Press Start 2P', cursive;">
+                        <h1>CONNECTION TERMINATED</h1>
+                        <p style="margin-top: 20px; color: var(--neon-cyan);">NO SIGNAL...</p>
+                        <a href="javascript:location.reload()" style="margin-top: 50px; color: white; font-size: 0.8rem;">[ REBOOT ]</a>
+                    </div>
+                `;
+            }
+        }
+
+        // Jalankan inisialisasi jika perlu
+        window.onload = () => {
+            console.log("RETRO_OS Siap...");
+        };
+    </script>
+
+</body>
+</html>

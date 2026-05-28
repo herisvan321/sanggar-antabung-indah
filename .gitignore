@@ -1,0 +1,16 @@
+/target
+/crates
+.env
+!.env.example
+/database/*.sqlite
+/storage/
+# macOS junk files
+.DS_Store
+list.md
+/node_modules
+/public/build
+/dist
+!/dist/.gitkeep
+.rustbasic_session
+report*.md
+.rustbasic_packages.json
