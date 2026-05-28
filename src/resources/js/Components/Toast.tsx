@@ -85,6 +85,7 @@ function SingleToast({ id, type, message, duration = 5000, onDismiss }: SingleTo
   const [isVisible, setIsVisible] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [progress, setProgress] = useState(100);
+  const [isDark, setIsDark] = useState(true);
 
   const style = STYLES[type] || STYLES.info;
 
@@ -92,6 +93,16 @@ function SingleToast({ id, type, message, duration = 5000, onDismiss }: SingleTo
     setIsLeaving(true);
     setTimeout(() => onDismiss(id), 350);
   }, [id, onDismiss]);
+
+  useEffect(() => {
+    const checkDark = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+    checkDark();
+    const observer = new MutationObserver(checkDark);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const enterTimer = setTimeout(() => setIsVisible(true), 10);
@@ -111,11 +122,15 @@ function SingleToast({ id, type, message, duration = 5000, onDismiss }: SingleTo
     };
   }, [duration, dismiss]);
 
+  const containerBg = isDark ? 'rgba(24, 24, 27, 0.95)' : 'rgba(255, 255, 255, 0.98)';
+  const containerBorder = isDark ? style.border : 'rgba(0, 0, 0, 0.08)';
+  const messageColor = isDark ? '#f1f5f9' : '#0f172a';
+
   return (
     <div
       style={{
-        background: style.bg,
-        border: `1px solid ${style.border}`,
+        background: containerBg,
+        border: `1px solid ${containerBorder}`,
         borderRadius: '16px',
         padding: '14px 18px',
         marginBottom: '10px',
@@ -124,7 +139,7 @@ function SingleToast({ id, type, message, duration = 5000, onDismiss }: SingleTo
         gap: '12px',
         color: style.color,
         backdropFilter: 'blur(20px)',
-        boxShadow: style.shadow,
+        boxShadow: isDark ? style.shadow : '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
         transform: isVisible && !isLeaving
           ? 'translateX(0) scale(1)'
           : isLeaving
@@ -159,7 +174,7 @@ function SingleToast({ id, type, message, duration = 5000, onDismiss }: SingleTo
         <div style={{
           fontSize: '13px',
           fontWeight: 500,
-          color: '#e2e8f0',
+          color: messageColor,
           lineHeight: 1.5,
           wordBreak: 'break-word',
         }}>{message}</div>

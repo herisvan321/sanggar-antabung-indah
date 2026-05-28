@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../Layouts/AppLayout';
 
 interface FormInputProps {
@@ -13,6 +13,15 @@ interface FormInputProps {
   disabled?: boolean;
 }
 
+function useSafeTheme() {
+  try {
+    const context = useTheme();
+    return context;
+  } catch (e) {
+    return null;
+  }
+}
+
 export default function FormInput({
   label,
   type = 'text',
@@ -24,7 +33,23 @@ export default function FormInput({
   autoFocus = false,
   disabled = false,
 }: FormInputProps) {
-  const { isDark } = useTheme();
+  const themeContext = useSafeTheme();
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    if (themeContext) {
+      setIsDark(themeContext.isDark);
+    } else {
+      const checkDark = () => {
+        setIsDark(document.documentElement.classList.contains('dark'));
+      };
+      checkDark();
+      const observer = new MutationObserver(checkDark);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      return () => observer.disconnect();
+    }
+  }, [themeContext, themeContext?.isDark]);
+
   const hasError = !!error;
 
   return (

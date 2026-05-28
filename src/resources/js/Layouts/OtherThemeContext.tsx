@@ -74,15 +74,19 @@ export function OtherThemeProvider({ children }: { children: ReactNode }) {
       body.style.backgroundColor = '#f8fafc';
       body.style.color = '#0f172a';
     }
-    
-    return () => {
-      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/other')) {
-        body.style.backgroundColor = '';
-        body.style.color = '';
-        body.style.fontFamily = '';
-      }
-    };
   }, [theme]);
+
+  // Clean up styles when this layout provider unmounts (leaving the layout)
+  useEffect(() => {
+    return () => {
+      const docRoot = document.documentElement;
+      const body = document.body;
+      docRoot.classList.remove('dark', 'light');
+      body.style.backgroundColor = '';
+      body.style.color = '';
+      body.style.fontFamily = '';
+    };
+  }, []);
 
   const toggleTheme = () => {
     setTheme(t => (t === 'dark' ? 'light' : 'dark'));

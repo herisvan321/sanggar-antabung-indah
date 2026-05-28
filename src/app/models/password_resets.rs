@@ -1,5 +1,4 @@
 use rustbasic_core::model;
-use rustbasic_core::chrono::NaiveDateTime;
 
 model! {
     table: "password_resets",
@@ -9,6 +8,6 @@ model! {
     Model {
         pub email: String,
         pub token: String,
-        pub created_at: NaiveDateTime,
+        pub created_at: String,
     }
 }

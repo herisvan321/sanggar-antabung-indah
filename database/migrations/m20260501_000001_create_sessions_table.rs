@@ -18,7 +18,23 @@ impl MigrationTrait for Migration {
             table.text("user_agent").nullable();
             table.text("payload").not_null();
             table.integer("last_activity").not_null();
-        }).await
+            table.no_timestamps();
+        }).await?;
+
+        // Mengatasi type mismatch decoding BLOB ke String pada driver SQLx Any di MySQL
+        let is_mysql = if let Ok(conn) = manager.pool.acquire().await {
+            conn.backend_name() == "MySQL"
+        } else {
+            false
+        };
+
+        if is_mysql {
+            rustbasic_core::sqlx::query("ALTER TABLE sessions MODIFY payload VARCHAR(8000) NOT NULL")
+                .execute(manager.pool)
+                .await?;
+        }
+
+        Ok(())
     }
 
     async fn down<'a>(&self, manager: &'a SchemaManager<'a>) -> Result<(), DbErr> {

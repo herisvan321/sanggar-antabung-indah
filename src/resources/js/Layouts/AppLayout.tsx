@@ -59,7 +59,31 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
+    const docRoot = document.documentElement;
+    const body = document.body;
+    if (theme === 'dark') {
+      docRoot.classList.add('dark');
+      docRoot.classList.remove('light');
+      body.style.backgroundColor = '#0a0a0f';
+      body.style.color = '#e5e5e5';
+    } else {
+      docRoot.classList.add('light');
+      docRoot.classList.remove('dark');
+      body.style.backgroundColor = '#f8f9fa';
+      body.style.color = '#1e293b';
+    }
   }, [theme]);
+
+  // Clean up styles when this layout provider unmounts (leaving the layout)
+  useEffect(() => {
+    return () => {
+      const docRoot = document.documentElement;
+      const body = document.body;
+      docRoot.classList.remove('dark', 'light');
+      body.style.backgroundColor = '';
+      body.style.color = '';
+    };
+  }, []);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {

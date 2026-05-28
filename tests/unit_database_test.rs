@@ -97,4 +97,3 @@ async fn test_database_insert_and_query() {
     // 9. Clean up menggunakan users::Model::destroy setelah test selesai agar tidak mengotori DB
     let _ = users::Model::destroy(&db, retrieved_user.id).await;
 }
-

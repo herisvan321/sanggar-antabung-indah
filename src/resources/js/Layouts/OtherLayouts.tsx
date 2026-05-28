@@ -67,11 +67,11 @@ function LayoutContent({ children }: OtherLayoutProps) {
       </div>
 
       {/* Header (Desktop Navigation) */}
-      <header className="fixed top-4 z-50 " style={{ width: '95%' }}>
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300" style={{ width: '95%' }}>
         <nav className="bg-white/80 dark:bg-black/50 backdrop-blur-xl border border-slate-200 dark:border-white/5 rounded-3xl px-6 py-4 sm:px-8 flex items-center justify-between shadow-lg dark:shadow-2xl">
-          <Link href="/" className="flex items-center gap-3 font-serif text-2xl sm:text-3xl font-black text-[#e11d48] hover:scale-105 transition-transform duration-300">
-            <i className="fas fa-drum text-2xl sm:text-3xl text-[#e11d48]"></i>
-            <span className="tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">RANDAI.SYS</span>
+          <Link href="/" className="flex items-center gap-3 font-serif text-xl sm:text-2xl font-black text-[#e11d48] hover:scale-105 transition-transform duration-300">
+            <i className="fas fa-drum text-xl sm:text-2xl text-[#e11d48]"></i>
+            <span className="tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">ANTABUNG.ART</span>
           </Link>
           
           {/* Desktop Menu Links */}
@@ -188,10 +188,10 @@ function LayoutContent({ children }: OtherLayoutProps) {
           <div className="md:col-span-5 space-y-4">
             <Link href="/" className="flex items-center gap-3 font-serif text-2xl font-black text-[#e11d48] w-fit">
               <i className="fas fa-drum text-2xl text-[#e11d48]"></i>
-              <span className="tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">RANDAI.SYS</span>
+              <span className="tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">ANTABUNG.ART</span>
             </Link>
             <p className="text-sm text-slate-500 dark:text-white/50 max-w-sm font-light leading-relaxed">
-              Digitalisasi Kesenian Tradisional Minangkabau. Wadah kolaborasi, edukasi filosofi, dan pementasan teater tutur di era modern.
+              Pusat Pelestarian Kesenian Tradisional Randai & Kaba khas Nagari Wisata Sisawah, Kecamatan Sumpur Kudus, Kabupaten Sijunjung, Sumatera Barat.
             </p>
           </div>
 
@@ -251,8 +251,8 @@ export default function OtherLayouts({ children }: OtherLayoutProps) {
   return (
     <OtherThemeProvider>
       <Head>
-        <title>Sanggar Randai | Digital Experience</title>
-        <meta name="description" content="Sanggar Randai - Digitalisasi Kesenian Tradisional Minangkabau. Platform pendaftaran, jadwal pementasan, dan edukasi filosofi Randai." />
+        <title>Sanggar Antabung Indah | Nagari Sisawah Sijunjung</title>
+        <meta name="description" content="Sanggar Antabung Indah - Digitalisasi Kesenian Randai, Tari Pijak Galeh, dan Musik Talempong Ungah khas Kenagarian Sisawah, Sumpur Kudus, Sijunjung." />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </Head>

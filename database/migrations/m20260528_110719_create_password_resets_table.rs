@@ -14,6 +14,8 @@ impl MigrationTrait for Migration {
             table.no_id();
             table.string("email").not_null().primary_key();
             table.string("token").not_null();
+            table.string("created_at").not_null();
+            table.no_timestamps();
         }).await
     }
 

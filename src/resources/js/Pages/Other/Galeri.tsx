@@ -2,25 +2,18 @@ import { useState } from 'react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
 
 const images = [
-  { category: 'pementasan', title: 'Pertunjukan Nan Tongga', cap: 'Pementasan kolosal dihadiri oleh 1.000 penonton di Bukittinggi.', img: 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600' },
-  { category: 'latihan', title: 'Latihan Rutin Silek Kurator', cap: 'Anggota senior melatih pola kuda-kuda kokoh.', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600' },
-  { category: 'sosial', title: 'Randai Masuk Sekolah', cap: 'Edukasi kesenian ke sekolah-sekolah dasar pelosok.', img: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=600' },
-  { category: 'pementasan', title: 'Gala Internasional Jakarta', cap: 'Penampilan istimewa di Festival Budaya Indonesia Baru.', img: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=600' },
-  { category: 'latihan', title: 'Harmoni Bunyi Gamelan', cap: 'Latihan instrumen musik perkusi talempong.', img: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600' },
-  { category: 'sosial', title: 'Penggalangan Dana Bencana', cap: 'Kolaborasi pentas amal untuk korban banjir lahar dingin.', img: 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=600' },
-  { category: 'pementasan', title: 'Teater Kaba Anggun Nan Tongga', cap: 'Adegan penuh ketegangan perebutan gelar kesaktian.', img: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=600' },
-  { category: 'latihan', title: 'Teknik Suara Dendang', cap: 'Penyelarasan vokal merdu mengikuti tempo gamelan.', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=600' },
-  { category: 'sosial', title: 'Pembersihan Cagar Budaya', cap: 'Aksi sosial melestarikan kebersihan rumah gadang tua.', img: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600' },
-  { category: 'pementasan', title: 'Pentas Festival Danau Singkarak', cap: 'Pertunjukan spektakuler di pinggiran danau nan asri.', img: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600' },
-  { category: 'latihan', title: 'Kelas Terbuka Anak-Anak', cap: 'Menanamkan benih cinta budaya sejak dini.', img: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=600' },
-  { category: 'sosial', title: 'Pemberdayaan Tenun Tradisional', cap: 'Kerja sama pelestarian motif songket kostum Randai.', img: 'https://images.unsplash.com/photo-1513829096999-4978602297a7?auto=format&fit=crop&w=600' },
-  { category: 'pementasan', title: 'Randai di Istana Kepresidenan', cap: 'Penghormatan tertinggi pementasan di hadapan tamu negara.', img: 'https://images.unsplash.com/photo-1484755560693-a4074577af3a?auto=format&fit=crop&w=600' },
-  { category: 'latihan', title: 'Fokus Gerak Refleks', cap: 'Latihan kecepatan menghindar dari pukulan lawan.', img: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=600' },
-  { category: 'sosial', title: 'Peringatan Hari Lahir Seni', cap: 'Syukuran tumpeng budaya bersama pemuka adat.', img: 'https://images.unsplash.com/photo-1531058020387-3be344559767?auto=format&fit=crop&w=600' }
+  { category: 'pementasan', title: 'Randai di Tebing Karst', cap: 'Pertunjukan randai kolosal di pelataran Ngalau Antabuang, Sisawah.', img: 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600' },
+  { category: 'alam', title: 'Pesona Ngalau Antabuang', cap: 'Mulut gua karst eksotis yang menjadi inspirasi nama Sanggar Seni kita.', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600' },
+  { category: 'latihan', title: 'Latihan Kuda-Kuda Silek', cap: 'Anak sasian berlatih gerak silek tradisi di gelanggang balai adat.', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600' },
+  { category: 'adat', title: 'Tradisi Bakaua Adat', cap: 'Prosesi syukuran panen padi melimpah oleh masyarakat Kenagarian Sisawah.', img: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=600' },
+  { category: 'pementasan', title: 'Talempong Pacik Sisawah', cap: 'Alunan talempong mengiringi langkah melingkar para penari randai.', img: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600' },
+  { category: 'alam', title: 'Jembatan Gantung Ikonik', cap: 'Jembatan gantung penyeberangan sungai Batang Sinamar yang asri.', img: 'https://images.unsplash.com/photo-1469488865564-c2de10f69f96?auto=format&fit=crop&w=600' },
+  { category: 'latihan', title: 'Penyelarasan Dendang Kaba', cap: 'Latihan olah vokal tutur (dendang) oleh bundo kanduang sanggar.', img: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=600' },
+  { category: 'adat', title: 'Arak-Arakan Jamba', cap: 'Ibu-ibu menjunjung dulang makanan saat perayaan Bakaua Adat.', img: 'https://images.unsplash.com/photo-1531058020387-3be344559767?auto=format&fit=crop&w=600' }
 ];
 
 export default function Galeri() {
-  const [galleryFilter, setGalleryFilter] = useState<'all' | 'pementasan' | 'latihan' | 'sosial'>('all');
+  const [galleryFilter, setGalleryFilter] = useState<'all' | 'pementasan' | 'latihan' | 'adat' | 'alam'>('all');
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -31,8 +24,8 @@ export default function Galeri() {
     <div className="space-y-12 animate-fade-in">
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-sm font-bold uppercase tracking-wider rounded-full">Koleksi Visual</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black">Dokumentasi Estetis</h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">Rekam jejak ekspresi emosional, pementasan kolosal, dan proses transformasi latihan para talenta berdarah seni tinggi.</p>
+        <h2 className="font-serif text-4xl sm:text-5xl font-black">Galeri Keindahan Sisawah</h2>
+        <p className="text-slate-600 dark:text-white/60 font-light text-base">Dokumentasi momen pementasan seni randai, proses latihan, keelokan alam perbukitan karst, dan adat istiadat Nagari Sisawah.</p>
       </div>
 
       {/* Gallery Filter Controls */}
@@ -41,7 +34,8 @@ export default function Galeri() {
           { id: 'all', label: 'Semua Dokumentasi' },
           { id: 'pementasan', label: 'Pementasan' },
           { id: 'latihan', label: 'Latihan' },
-          { id: 'sosial', label: 'Kegiatan Sosial' }
+          { id: 'adat', label: 'Upacara Adat' },
+          { id: 'alam', label: 'Bentang Alam' }
         ].map(btn => (
           <button 
             key={btn.id}
@@ -57,7 +51,7 @@ export default function Galeri() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {images
           .filter(img => galleryFilter === 'all' || img.category === galleryFilter)
           .map((img, idx) => (

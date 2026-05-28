@@ -19,7 +19,8 @@ impl MigrationTrait for Migration {
             table.string("causer_type").nullable();
             table.integer("causer_id").nullable();
             table.text("properties").nullable(); // JSON disimpan sebagai TEXT
-            table.timestamps();
+            table.string("created_at").nullable();
+            table.string("updated_at").nullable();
         }).await
     }
 

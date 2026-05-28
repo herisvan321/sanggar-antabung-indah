@@ -14,3 +14,5 @@ pub use inertia::inertia;
 
 
 pub mod helpers;
+pub mod services;
+pub mod observers;

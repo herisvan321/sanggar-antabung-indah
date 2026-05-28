@@ -5,7 +5,7 @@
 @source "../js/**/*.tsx";
 @source "../js/**/*.ts";
 
-@variant dark (&:is(.dark *));
+@variant dark (&:where(.dark, .dark *));
 
 
 @layer base {

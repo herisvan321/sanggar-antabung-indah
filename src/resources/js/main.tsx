@@ -3,7 +3,14 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import axios from 'axios';
 import AppLayout from './Layouts/AppLayout';
+import AdminLayout from './Layouts/AdminLayout';
 import '../css/tailwind.css';
+import 'datatables.net-dt/css/dataTables.dataTables.css';
+import '../css/premium-ui.css';
+import DataTable from 'datatables.net-react';
+import DT from 'datatables.net-dt';
+
+DataTable.use(DT);
 
 // Extend the Window interface to typecheck window.axios
 declare global {
@@ -35,7 +42,15 @@ createInertiaApp({
     
     // Set default persistent layout
     const pageComponent = page.default;
-    pageComponent.layout = pageComponent.layout || ((pageNode: React.ReactNode) => <AppLayout>{pageNode}</AppLayout>);
+    
+    // Konfigurasi Layout Persisten
+    if (name.startsWith('Admin/') || name === 'Dashboard') {
+      // Halaman Admin & Dashboard menggunakan AdminLayout
+      pageComponent.layout = pageComponent.layout || ((pageNode: React.ReactNode) => <AdminLayout>{pageNode}</AdminLayout>);
+    } else if (!name.startsWith('Auth/')) {
+      // Halaman publik lainnya menggunakan AppLayout
+      pageComponent.layout = pageComponent.layout || ((pageNode: React.ReactNode) => <AppLayout>{pageNode}</AppLayout>);
+    }
     
     return pageComponent;
   },

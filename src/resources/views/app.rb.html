@@ -20,23 +20,48 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS for Premium Styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Assets dari Vite -->
+    <!-- Assets dari Vite (Tailwind v4 is compiled here) -->
     {{ vite_assets | safe }}
     
+    <script>
+        // Setup initial theme dynamically before rendering fully to prevent flash
+        (function() {
+            const path = window.location.pathname;
+            const isAdminRoute = path.startsWith('/dashboard');
+            const otherRoutes = ['/', '/profil', '/filosofi', '/galeri', '/jadwal', '/program', '/join', '/berita', '/booking', '/kontak', '/sop'];
+            const isOtherRoute = otherRoutes.includes(path) || isAdminRoute;
+            
+            let theme = 'light';
+            if (isOtherRoute) {
+                theme = localStorage.getItem('other_theme') || 'light';
+            } else {
+                theme = localStorage.getItem('theme') || 'dark';
+            }
+            
+            document.documentElement.classList.add(theme);
+        })();
+    </script>
+    
     <style>
-        /* Smooth transitions & dark mode base styling */
+        /* Smooth transitions & default spacing */
         html, body {
-            background-color: #0b0f19;
-            color: #f3f4f6;
             margin: 0;
             padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             scroll-behavior: smooth;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        html.dark, html.dark body {
+            background-color: #0a0a0c !important;
+            color: #ffffff !important;
+        }
+
+        html.light, html.light body {
+            background-color: #f8fafc !important;
+            color: #0f172a !important;
         }
         
         /* Hide scrollbars during transitions */

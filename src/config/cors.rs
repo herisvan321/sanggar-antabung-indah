@@ -17,5 +17,6 @@ pub async fn cors_middleware(req: Request, next: Next) -> Response {
     headers.insert("access-control-allow-origin", "*".parse().unwrap());
     headers.insert("access-control-allow-methods", "GET, POST, PUT, DELETE, OPTIONS".parse().unwrap());
     headers.insert("access-control-allow-headers", "*".parse().unwrap());
+
     res
 }

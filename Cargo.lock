@@ -1709,10 +1709,25 @@ name = "rustbasic"
 version = "0.1.10"
 dependencies = [
  "rust-embed",
+ "rustbasic-activitylog",
  "rustbasic-breeze",
  "rustbasic-core",
  "rustbasic-medialibrary",
  "serde",
+ "tokio",
+]
+
+[[package]]
+name = "rustbasic-activitylog"
+version = "0.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec8d49316156b4d4496760aeed613baeb4696cd37551317285a3f948f6f74242"
+dependencies = [
+ "chrono",
+ "colored",
+ "rustbasic-core",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 
