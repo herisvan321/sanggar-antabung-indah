@@ -1,7 +1,26 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
+import { useOtherTheme } from '../../Layouts/OtherThemeContext';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
-const images = [
+interface PageSection {
+  id: number;
+  page_key: string;
+  section_key: string;
+  title: string | null;
+  subtitle: string | null;
+  content: string | null;
+  media_url: string | null;
+  video_url: string | null;
+}
+
+interface GaleriProps {
+  sections?: PageSection[];
+  galleries?: any[];
+}
+
+const defaultImages = [
   { category: 'pementasan', title: 'Randai di Tebing Karst', cap: 'Pertunjukan randai kolosal di pelataran Ngalau Antabuang, Sisawah.', img: 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=600' },
   { category: 'alam', title: 'Pesona Ngalau Antabuang', cap: 'Mulut gua karst eksotis yang menjadi inspirasi nama Sanggar Seni kita.', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600' },
   { category: 'latihan', title: 'Latihan Kuda-Kuda Silek', cap: 'Anak sasian berlatih gerak silek tradisi di gelanggang balai adat.', img: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600' },
@@ -12,20 +31,76 @@ const images = [
   { category: 'adat', title: 'Arak-Arakan Jamba', cap: 'Ibu-ibu menjunjung dulang makanan saat perayaan Bakaua Adat.', img: 'https://images.unsplash.com/photo-1531058020387-3be344559767?auto=format&fit=crop&w=600' }
 ];
 
-export default function Galeri() {
-  const [galleryFilter, setGalleryFilter] = useState<'all' | 'pementasan' | 'latihan' | 'adat' | 'alam'>('all');
+export default function Galeri({ sections, galleries }: GaleriProps) {
+  const { isDark } = useOtherTheme();
+  const [isLoading, setIsLoading] = useState(true);
+  const [galleryFilter, setGalleryFilter] = useState<'all' | 'pementasan' | 'latihan' | 'adat' | 'alam' | string>('all');
 
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxImage, setLightboxImage] = useState('');
   const [lightboxCaption, setLightboxCaption] = useState('');
 
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const getSection = (key: string) => {
+    return sections?.find(s => s.section_key === key);
+  };
+
+  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
+  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
+
+  if (isLoading || !sections) {
+    return (
+      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
+        <div className="space-y-12 animate-fade-in">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <Skeleton height={20} width="20%" className="mx-auto" />
+            <Skeleton height={40} width="60%" className="mx-auto" />
+            <Skeleton height={24} width="85%" className="mx-auto" />
+          </div>
+          <div className="flex flex-wrap justify-center gap-3">
+            {[1, 2, 3, 4, 5].map(idx => (
+              <Skeleton key={idx} height={40} width={120} borderRadius={12} />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map(idx => (
+              <Skeleton key={idx} height={256} borderRadius={16} />
+            ))}
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
+  // Parse Header
+  const headerSec = getSection('header');
+  const headerTitle = headerSec?.title || "Galeri Keindahan Sisawah";
+  const headerSub = headerSec?.subtitle || "Dokumentasi momen pementasan seni randai, proses latihan, keelokan alam perbukitan karst, dan adat istiadat Nagari Sisawah.";
+
+  const galleryList = (galleries && galleries.length > 0)
+    ? galleries.map(g => ({ category: g.category.toLowerCase(), title: g.title, cap: g.description || '', img: g.media_url }))
+    : defaultImages;
+
   return (
     <div className="space-y-12 animate-fade-in">
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-sm font-bold uppercase tracking-wider rounded-full">Koleksi Visual</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black">Galeri Keindahan Sisawah</h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">Dokumentasi momen pementasan seni randai, proses latihan, keelokan alam perbukitan karst, dan adat istiadat Nagari Sisawah.</p>
+        <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
+          {headerTitle.includes('\n') ? (
+            <>
+              {headerTitle.split('\n')[0]} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
+            </>
+          ) : (
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
+          )}
+        </h2>
+        <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
       </div>
 
       {/* Gallery Filter Controls */}
@@ -52,7 +127,7 @@ export default function Galeri() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {images
+        {galleryList
           .filter(img => galleryFilter === 'all' || img.category === galleryFilter)
           .map((img, idx) => (
             <div 

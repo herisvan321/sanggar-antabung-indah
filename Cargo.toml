@@ -24,6 +24,7 @@ rust-embed = "8.11.0"
 tokio = { version = "1.52.1", features = ["full"] }
 rustbasic-medialibrary = "0.0.4"
 rustbasic-activitylog = "0.0.5"
+rustbasic-webp = "0.0"
 
 # Profile Optimizations
 [profile.dev]

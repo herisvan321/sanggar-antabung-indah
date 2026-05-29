@@ -1,43 +1,160 @@
+import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
+import { useOtherTheme } from '../../Layouts/OtherThemeContext';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
-const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+interface PageSection {
+  id: number;
+  page_key: string;
+  section_key: string;
+  title: string | null;
+  subtitle: string | null;
+  content: string | null;
+  media_url: string | null;
+  video_url: string | null;
+}
 
-export default function Jadwal() {
+interface ScheduleItem {
+  id?: number;
+  date: string;
+  title: string;
+  place: string;
+  time?: string;
+  activity?: string;
+  category: string;
+}
+
+interface JadwalProps {
+  sections?: PageSection[];
+  schedules?: ScheduleItem[];
+}
+
+const defaultLatihan: ScheduleItem[] = [
+  { id: 1, date: "Selasa & Jumat", time: "20:00 - 23:00 WIB", activity: "Latihan Silek & Randai Terbuka", title: "Latihan Silek & Randai Terbuka", place: "Gelanggang Utama Jorong Tarok", category: "latihan" },
+  { id: 2, date: "Sabtu", time: "14:00 - 17:00 WIB", activity: "Kelas Talempong Ungah & Canang Anak-Anak", title: "Kelas Talempong Ungah & Canang Anak-Anak", place: "Pendopo Sanggar", category: "latihan" }
+];
+
+const defaultPertunjukan: ScheduleItem[] = [
+  { id: 3, date: "12 Sep 2026", title: "Pementasan Randai Kolosal di Pelataran Ngalau Antabuang", activity: "Pementasan Randai Kolosal di Pelataran Ngalau Antabuang", place: "Desa Wisata Sisawah", category: "pertunjukan" },
+  { id: 4, date: "28 Okt 2026", title: "Prosesi Budaya Bakaua Adat Nagari Sisawah", activity: "Prosesi Budaya Bakaua Adat Nagari Sisawah", place: "Gelanggang Balai Adat", category: "pertunjukan" }
+];
+
+export default function Jadwal({ sections, schedules }: JadwalProps) {
+  const { isDark } = useOtherTheme();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const getSection = (key: string) => {
+    return sections?.find(s => s.section_key === key);
+  };
+
+  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
+  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
+
+  if (isLoading || !sections) {
+    return (
+      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
+        <div className="space-y-12 animate-fade-in">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <Skeleton height={20} width="20%" className="mx-auto" />
+            <Skeleton height={40} width="60%" className="mx-auto" />
+            <Skeleton height={24} width="85%" className="mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
+              <Skeleton height={28} width="40%" />
+              <Skeleton height={80} count={2} />
+            </div>
+            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
+              <Skeleton height={28} width="40%" />
+              <Skeleton height={80} count={2} />
+            </div>
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
+  // Parse Sections
+  const headerSec = getSection('header');
+  const latihanSec = getSection('latihan');
+  const pertunjukanSec = getSection('pertunjukan');
+
+  const headerTitle = headerSec?.title || "Jadwal Gelanggang \n& Pentas Budaya.";
+  const headerSub = headerSec?.subtitle || "Ikuti agenda latihan rutin anak sasian di gelanggang balai adat dan pementasan seni kolosal menyambut wisatawan Desa Wisata Sisawah.";
+
+  const rawLatihan = schedules?.filter(s => s.category === 'latihan') || [];
+  const latihanList = rawLatihan.length > 0 ? rawLatihan : defaultLatihan;
+
+  const rawPertunjukan = schedules?.filter(s => s.category === 'pertunjukan') || [];
+  const pertunjukanList = rawPertunjukan.length > 0 ? rawPertunjukan : defaultPertunjukan;
+
   return (
     <div className="space-y-12 animate-fade-in">
+      {/* Header */}
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#e11d48]/10 text-[#e11d48] text-sm font-bold uppercase tracking-wider rounded-full">Agenda Seni</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black">Jadwal Latihan & Pementasan</h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">Ikuti agenda latihan rutin anak sasian di gelanggang balai adat dan pementasan seni kolosal menyambut wisatawan Desa Wisata Sisawah.</p>
+        <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
+          {headerTitle.includes('\n') ? (
+            <>
+              {headerTitle.split('\n')[0]} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
+            </>
+          ) : (
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
+          )}
+        </h2>
+        <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {months.map((m, idx) => (
-          <div key={idx} className="p-6 rounded-3xl bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-none hover:border-[#10b981]/40 transition-all duration-300 space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-bold font-serif text-[#d97706] dark:text-[#fbbf24]">{m} 2026</span>
-              <span className="px-2 py-0.5 bg-[#10b981]/10 text-[#10b981] text-xs font-bold rounded-full">Jadwal</span>
-            </div>
-            
-            <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 space-y-1 border border-slate-100 dark:border-none">
-                <span className="block text-sm font-bold text-slate-800 dark:text-white/90">Latihan Rutin Randai & Silek</span>
-                <span className="block text-xs text-slate-500 dark:text-white/40"><i className="fas fa-clock mr-1"></i> Setiap Sabtu, 20:00 WIB</span>
-                <span className="block text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> Balai Adat Nagari Sisawah</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Latihan Card */}
+        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+          <span className="text-[#10b981] text-base font-bold uppercase tracking-widest block">
+            <i className="fas fa-calendar-alt mr-2"></i> {latihanSec?.title || "Jadwal Latihan Mingguan"}
+          </span>
+          <div className="space-y-4">
+            {latihanList.map((item, idx) => (
+              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-black text-slate-800 dark:text-white">{item.date}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 bg-[#10b981]/10 text-[#10b981] rounded-md">{item.time || "N/A"}</span>
+                </div>
+                <h4 className="text-sm font-bold text-[#e11d48]">{item.activity || item.title}</h4>
+                <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 space-y-1 border border-slate-100 dark:border-none">
-                <span className="block text-sm font-bold text-slate-800 dark:text-white/90">Atraksi Budaya Ngalau Antabuang</span>
-                <span className="block text-xs text-slate-500 dark:text-white/40"><i className="fas fa-clock mr-1"></i> Minggu Siang, 13:00 WIB</span>
-                <span className="block text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> Area Parkir Ngalau Antabuang</span>
-              </div>
-            </div>
-
-            <Link href="/booking" className="block text-center w-full py-2 bg-slate-100 dark:bg-white/5 hover:bg-[#10b981] dark:hover:bg-[#10b981] text-slate-700 dark:text-white/70 hover:text-white text-xs font-bold rounded-lg transition-all duration-300 uppercase tracking-wider">
-              Booking Reservasi
-            </Link>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Pertunjukan Card */}
+        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+          <span className="text-[#fbbf24] text-base font-bold uppercase tracking-widest block">
+            <i className="fas fa-bullhorn mr-2"></i> {pertunjukanSec?.title || "Pementasan Besar Terdekat"}
+          </span>
+          <div className="space-y-4">
+            {pertunjukanList.map((item, idx) => (
+              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-black text-slate-800 dark:text-white">{item.title}</span>
+                  <span className="text-xs font-semibold px-2 py-0.5 bg-[#fbbf24]/10 text-[#d97706] dark:text-[#fbbf24] rounded-md">{item.date}</span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
+              </div>
+            ))}
+          </div>
+          <Link href="/booking" className="block text-center w-full py-4 bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold rounded-xl transition-all duration-300 uppercase tracking-widest">
+            Booking Pentas / Hubungi Kami
+          </Link>
+        </div>
+
       </div>
     </div>
   );

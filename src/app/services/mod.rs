@@ -3,3 +3,17 @@ pub mod rbac_service;
 pub mod profile_service;
 pub mod dashboard_service;
 pub mod auth_service;
+pub mod setting_service;
+pub mod page_section_service;
+
+pub mod article_service;
+pub mod schedule_service;
+pub mod program_service;
+pub mod metric_service;
+pub mod structure_service;
+pub mod philosophical_value_service;
+pub mod gallery_service;
+pub mod join_step_service;
+pub mod booking_package_service;
+pub mod sop_rule_service;
+pub mod contact_info_service;

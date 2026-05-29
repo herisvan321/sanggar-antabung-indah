@@ -1,41 +1,166 @@
+import { useEffect, useState } from 'react';
 import { Link } from '@inertiajs/react';
-import { useOtherTheme } from '../../Layouts/OtherThemeContext';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
+import { useOtherTheme } from '../../Layouts/OtherThemeContext';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
-const programs = [
-  { title: 'Silek Langkah Salapan (Silat)', level: 'Dasar', dur: '1 Bulan / 8 Sesi', col: 'border-rose-500/30 dark:border-rose-500/30' },
-  { title: 'Hentakan Ritme Galembong', level: 'Dasar', dur: '1 Bulan / 8 Sesi', col: 'border-green-500/30 dark:border-green-500/30' },
-  { title: 'Talempong Ungah Sisawah', level: 'Menengah', dur: '2 Bulan / 16 Sesi', col: 'border-yellow-500/30 dark:border-yellow-500/30' },
-  { title: 'Sastra Lisan Kaba Cindua Mato', level: 'Menengah', dur: '3 Bulan / 24 Sesi', col: 'border-blue-500/30 dark:border-blue-500/30' },
-  { title: 'Tari Pijak Galeh (Tari Piring)', level: 'Lanjutan', dur: '3 Bulan / 24 Sesi', col: 'border-purple-500/30 dark:border-purple-500/30' },
-  { title: 'Koreografi Randai Kontemporer', level: 'Lanjutan', dur: '4 Bulan / 32 Sesi', col: 'border-teal-500/30 dark:border-teal-500/30' }
+interface PageSection {
+  id: number;
+  page_key: string;
+  section_key: string;
+  title: string | null;
+  subtitle: string | null;
+  content: string | null;
+  media_url: string | null;
+  video_url: string | null;
+}
+
+interface ProgramItem {
+  id?: number;
+  title: string;
+  description: string;
+  icon: string;
+  category: string;
+}
+
+interface ProgramProps {
+  sections?: PageSection[];
+  programs?: ProgramItem[];
+}
+
+const defaultReguler: ProgramItem[] = [
+  { id: 1, title: "Kelas Silek Tradisi", description: "Pelatihan bela diri silat Minang aliran Sisawah untuk melatih fisik.", icon: "fa-shoe-prints", category: "reguler" },
+  { id: 2, title: "Teater tutur Randai", description: "Kelas akting teater rakyat, vokal dendang, dan tepukan celana galembong.", icon: "fa-users", category: "reguler" }
 ];
 
-export default function Program() {
-  const { showToast } = useOtherTheme();
+const defaultEkowisata: ProgramItem[] = [
+  { id: 3, title: "Pentas Budaya Gua", description: "Menyaksikan randai di mulut Gua Ngalau Antabuang yang eksotis.", icon: "fa-mountain-sun", category: "ekowisata" },
+  { id: 4, title: "Jelajah Wisata Adat", description: "Tur keliling nagari mengenal sejarah adat dan prosesi pertanian tradisional.", icon: "fa-leaf", category: "ekowisata" }
+];
+
+export default function Program({ sections, programs }: ProgramProps) {
+  const { isDark, showToast } = useOtherTheme();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const getSection = (key: string) => {
+    return sections?.find(s => s.section_key === key);
+  };
+
+  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
+  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
+
+  if (isLoading || !sections) {
+    return (
+      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
+        <div className="space-y-12 animate-fade-in">
+          <div className="text-center max-w-2xl mx-auto space-y-4">
+            <Skeleton height={20} width="20%" className="mx-auto" />
+            <Skeleton height={40} width="60%" className="mx-auto" />
+            <Skeleton height={24} width="85%" className="mx-auto" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
+              <Skeleton height={28} width="40%" />
+              <Skeleton height={80} count={2} />
+            </div>
+            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
+              <Skeleton height={28} width="40%" />
+              <Skeleton height={80} count={2} />
+            </div>
+          </div>
+        </div>
+      </SkeletonTheme>
+    );
+  }
+
+  // Parse Sections
+  const headerSec = getSection('header');
+  const regulerSec = getSection('reguler');
+  const ekowisataSec = getSection('ekowisata');
+
+  const headerTitle = headerSec?.title || "Program Pelestarian \nSeni Tradisi.";
+  const headerSub = headerSec?.subtitle || "Kami menyelenggarakan berbagai program berkelanjutan untuk menjaga warisan adat budaya tetap hidup.";
+
+  const rawReguler = programs?.filter(p => p.category === 'reguler') || [];
+  const regulerList = rawReguler.length > 0 ? rawReguler : defaultReguler;
+
+  const rawEkowisata = programs?.filter(p => p.category === 'ekowisata') || [];
+  const ekowisataList = rawEkowisata.length > 0 ? rawEkowisata : defaultEkowisata;
 
   return (
     <div className="space-y-12 animate-fade-in">
+      {/* Header */}
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#fbbf24]/10 text-[#d97706] dark:text-[#fbbf24] text-sm font-bold uppercase tracking-wider rounded-full">Pusat Latihan</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black">Program Pendidikan Seni</h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">Kami membuka kelas pelatihan berkala bagi anak-anak nagari maupun wisatawan yang tertarik mempelajari kebudayaan Minangkabau.</p>
+        <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
+          {headerTitle.includes('\n') ? (
+            <>
+              {headerTitle.split('\n')[0]} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
+            </>
+          ) : (
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
+          )}
+        </h2>
+        <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {programs.map((p, i) => (
-          <div key={i} className={`p-6 rounded-3xl bg-white dark:bg-[#141417]/80 border shadow-sm dark:shadow-none ${p.col} flex flex-col justify-between`}>
-            <div>
-              <span className="inline-block px-2 py-0.5 bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-white/50 text-xs font-bold rounded-full mb-3">{p.level}</span>
-              <h4 className="font-serif text-xl font-bold mb-2 leading-tight text-slate-800 dark:text-white">{p.title}</h4>
-              <span className="block text-sm text-slate-500 dark:text-white/40"><i className="fas fa-calendar-alt mr-2"></i> {p.dur}</span>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 flex gap-2">
-              <Link href="/join" className="px-3.5 py-2.5 bg-[#fbbf24] hover:bg-[#d97706] text-black text-xs font-bold rounded-lg transition-colors duration-300 uppercase tracking-wider">Ikut Kelas</Link>
-              <button onClick={() => showToast('Silabus terunduh di perangkat Anda!')} className="px-3.5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white/70 text-xs font-bold rounded-lg transition-colors duration-300"><i className="fas fa-download"></i> Silabus</button>
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Kelas Seni Reguler Card */}
+        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+          <span className="text-[#10b981] text-base font-bold uppercase tracking-widest block">
+            <i className="fas fa-school mr-2"></i> {regulerSec?.title || "Kelas Seni & Budaya Reguler"}
+          </span>
+          <div className="space-y-4">
+            {regulerList.map((item, idx) => (
+              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-xl bg-[#10b981]/15 text-[#10b981] flex items-center justify-center shrink-0">
+                  <i className={`fas ${item.icon || 'fa-graduation-cap'}`}></i>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{item.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-white/50 leading-relaxed mt-1 font-light">{item.description}</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        {/* Ekowisata Seni Card */}
+        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+          <span className="text-[#fbbf24] text-base font-bold uppercase tracking-widest block">
+            <i className="fas fa-route mr-2"></i> {ekowisataSec?.title || "Ekowisata Seni Sisawah"}
+          </span>
+          <div className="space-y-4">
+            {ekowisataList.map((item, idx) => (
+              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-xl bg-[#fbbf24]/15 text-[#d97706] dark:text-[#fbbf24] flex items-center justify-center shrink-0">
+                  <i className={`fas ${item.icon || 'fa-hiking'}`}></i>
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{item.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-white/50 leading-relaxed mt-1 font-light">{item.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-3 pt-2">
+            <Link href="/join" className="flex-1 text-center py-4.5 bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold rounded-xl transition-all duration-300 uppercase tracking-widest">
+              Daftar Murid
+            </Link>
+            <button onClick={() => showToast('Mengunduh katalog ekowisata...')} className="px-5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-700 dark:text-white/70 rounded-xl transition-all">
+              <i className="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
   );

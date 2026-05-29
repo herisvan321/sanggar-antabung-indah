@@ -1,4 +1,17 @@
-use crate::app::inertia;
+use crate::app::helpers::guest::render_guest;
+use crate::app::services::page_section_service::PageSectionService;
+use crate::app::services::article_service::ArticleService;
+use crate::app::services::schedule_service::ScheduleService;
+use crate::app::services::program_service::ProgramService;
+use crate::app::services::metric_service::MetricService;
+use crate::app::services::structure_service::StructureService;
+use crate::app::services::philosophical_value_service::PhilosophicalValueService;
+use crate::app::services::gallery_service::GalleryService;
+use crate::app::services::join_step_service::JoinStepService;
+use crate::app::services::booking_package_service::BookingPackageService;
+use crate::app::services::sop_rule_service::SopRuleService;
+use crate::app::services::contact_info_service::ContactInfoService;
+
 use rustbasic_core::requests::Request;
 use rustbasic_core::responses::ResponseHelper;
 use rustbasic_core::server::AppState;
@@ -6,22 +19,15 @@ use rustbasic_core::{State, IntoResponse};
 use rustbasic_core::serde_json::json;
 
 pub async fn index(req: Request) -> impl IntoResponse {
-    // Cek apakah fitur Auth sudah terinstal (scaffolded)
     let auth_installed = std::path::Path::new("src/app/http/controllers/auth").exists();
-    let user_id = req.session.get::<i32>("user_id").unwrap_or(0);
-    let is_logged_in = user_id > 0;
-
-    // Render komponen "Welcome" melalui Inertia dengan data props
-    inertia(&req, "Welcome", json!({
+    render_guest(&req, "Welcome", json!({
         "title": "Selamat Datang di RustBasic",
         "auth_installed": auth_installed,
-        "is_logged_in": is_logged_in,
     }))
 }
 
 pub async fn about(req: Request) -> impl IntoResponse {
-    // Render komponen "About" melalui Inertia dengan data props
-    inertia(&req, "About", json!({
+    render_guest(&req, "About", json!({
         "title": "Tentang RustBasic SPA",
         "description": "Aplikasi ini telah sepenuhnya bermigrasi dari Multi-Page Application (MPA) tradisional berbasis template Minijinja menjadi Single Page Application (SPA) modern yang ditenagai oleh React.js dan Inertia.js pada backend kustom Rust!",
         "version": "1.0.0",
@@ -40,47 +46,117 @@ pub async fn dev_info(State(state): State<AppState>, _req: Request) -> impl Into
         "rate_limit": state.config.app_limit_request
     }))
 }
-pub async fn other(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Home", json!({}))
+
+pub async fn other(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("home").await.unwrap_or_default();
+    let metrics = MetricService::new(state.db.clone()).get_all_metrics().await.unwrap_or_default();
+    let programs = ProgramService::new(state.db.clone()).get_all_programs().await.unwrap_or_default();
+    let schedules = ScheduleService::new(state.db.clone()).get_schedules_by_category("pertunjukan").await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Home", json!({
+        "sections": sections,
+        "metrics": metrics,
+        "programs": programs,
+        "schedules": schedules
+    }))
 }
 
-pub async fn other_profil(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Profil", json!({}))
+pub async fn other_profil(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("profil").await.unwrap_or_default();
+    let structures = StructureService::new(state.db.clone()).get_all_structures().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Profil", json!({
+        "sections": sections,
+        "structures": structures
+    }))
 }
 
-pub async fn other_filosofi(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Filosofi", json!({}))
+pub async fn other_filosofi(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("filosofi").await.unwrap_or_default();
+    let values = PhilosophicalValueService::new(state.db.clone()).get_all_values().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Filosofi", json!({
+        "sections": sections,
+        "philosophical_values": values
+    }))
 }
 
-pub async fn other_galeri(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Galeri", json!({}))
+pub async fn other_galeri(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("galeri").await.unwrap_or_default();
+    let galleries = GalleryService::new(state.db.clone()).get_all_galleries().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Galeri", json!({
+        "sections": sections,
+        "galleries": galleries
+    }))
 }
 
-pub async fn other_jadwal(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Jadwal", json!({}))
+pub async fn other_jadwal(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("jadwal").await.unwrap_or_default();
+    let schedules = ScheduleService::new(state.db.clone()).get_all_schedules().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Jadwal", json!({
+        "sections": sections,
+        "schedules": schedules
+    }))
 }
 
-pub async fn other_program(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Program", json!({}))
+pub async fn other_program(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("program").await.unwrap_or_default();
+    let programs = ProgramService::new(state.db.clone()).get_all_programs().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Program", json!({
+        "sections": sections,
+        "programs": programs
+    }))
 }
 
-pub async fn other_join(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Join", json!({}))
+pub async fn other_join(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("join").await.unwrap_or_default();
+    let steps = JoinStepService::new(state.db.clone()).get_all_steps().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Join", json!({
+        "sections": sections,
+        "join_steps": steps
+    }))
 }
 
-pub async fn other_berita(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Berita", json!({}))
+pub async fn other_berita(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("berita").await.unwrap_or_default();
+    let articles = ArticleService::new(state.db.clone()).get_all_articles().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Berita", json!({
+        "sections": sections,
+        "articles": articles
+    }))
 }
 
-pub async fn other_booking(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Booking", json!({}))
+pub async fn other_booking(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("booking").await.unwrap_or_default();
+    let packages = BookingPackageService::new(state.db.clone()).get_all_packages().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Booking", json!({
+        "sections": sections,
+        "booking_packages": packages
+    }))
 }
 
-pub async fn other_kontak(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Kontak", json!({}))
+pub async fn other_kontak(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("kontak").await.unwrap_or_default();
+    let infos = ContactInfoService::new(state.db.clone()).get_all_infos().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Kontak", json!({
+        "sections": sections,
+        "contact_infos": infos
+    }))
 }
 
-pub async fn other_sop(req: Request) -> impl IntoResponse {
-    inertia(&req, "Other/Sop", json!({}))
+pub async fn other_sop(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("sop").await.unwrap_or_default();
+    let rules = SopRuleService::new(state.db.clone()).get_all_rules().await.unwrap_or_default();
+    
+    render_guest(&req, "Other/Sop", json!({
+        "sections": sections,
+        "sop_rules": rules
+    }))
 }
-

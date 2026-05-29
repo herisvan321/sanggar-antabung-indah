@@ -36,6 +36,21 @@ pub fn inertia(req: &Request, component: &str, props: Value) -> Response {
             "warning": warning,
             "info": info
         }));
+
+        // Fetch global settings from database
+        let db = req.state.db.clone();
+        let settings = tokio::task::block_in_place(|| {
+            tokio::runtime::Handle::current().block_on(async {
+                rustbasic_core::database::DB::table(&db, "settings")
+                    .first::<rustbasic_core::serde_json::Value>()
+                    .await
+                    .unwrap_or(None)
+            })
+        });
+
+        if let Some(s) = settings {
+            map.insert("settings".to_string(), s);
+        }
     }
 
     let page_object = json!({

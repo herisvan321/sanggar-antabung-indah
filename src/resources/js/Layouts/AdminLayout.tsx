@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState, useRef } from 'react';
-import { Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { OtherThemeProvider, useOtherTheme } from './OtherThemeContext';
 import Swal from 'sweetalert2';
 
@@ -60,7 +60,7 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
         showConfirmButton: false,
         background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         color: isDark ? '#fff' : '#1e293b',
-        backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+        backdrop: `rgba(0,0,0,0.4)`,
         customClass: {
           popup: 'premium-swal-popup',
         },
@@ -73,7 +73,7 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
         text: activeFlash.error,
         background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
         color: isDark ? '#fff' : '#1e293b',
-        backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+        backdrop: `rgba(0,0,0,0.4)`,
         customClass: {
           popup: 'premium-swal-popup',
         },
@@ -95,7 +95,7 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
       cancelButtonText: 'Batal',
       background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       color: isDark ? '#fff' : '#1e293b',
-      backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+      backdrop: `rgba(0,0,0,0.4)`,
       customClass: {
         popup: 'premium-swal-popup',
       }
@@ -108,6 +108,8 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
 
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: 'fa-chart-line', permission: 'view_dashboard' },
+    { name: 'Manajemen Halaman', href: '/dashboard/pages', icon: 'fa-file-invoice', permission: 'manage_pages' },
+    { name: 'Pengaturan', href: '/dashboard/settings', icon: 'fa-gear', permission: 'manage_settings' },
   ];
 
   const rbacLinks = [
@@ -130,6 +132,9 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#0a0a0c] text-slate-800 dark:text-slate-100 font-sans transition-colors duration-500 flex flex-col">
+      <Head>
+        <title>{displayTitle || 'Admin Panel'}</title>
+      </Head>
 
       {/* Top Glassmorphic Navigation Bar */}
       <header className="sticky top-0 z-40 bg-white/70 dark:bg-[#0a0a0c]/70 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300">

@@ -38,6 +38,7 @@ interface DashboardProps {
   activityChart?: ActivityChartPoint[];
   activityDonut?: ActivityDonutPoint[];
   activityLogs?: ActivityLogRow[];
+  roles?: string[];
 }
 
 const periodLabels: Record<string, string> = {
@@ -109,11 +110,16 @@ export default function Dashboard({
   activityChart = [],
   activityDonut = [],
   activityLogs = [],
+  roles = [],
 }: DashboardProps) {
   const { isDark } = useOtherTheme();
   const maxActivity = Math.max(1, ...activityChart.map((point) => point.count));
   const donutTotal = activityDonut.reduce((total, point) => total + point.count, 0);
   const selectedPeriod = periodLabels[activityPeriod] ? activityPeriod : 'today';
+
+  const isAdmin = roles.includes('admin') || roles.length === 0;
+  const isInstructor = roles.includes('instructor');
+  const isMember = roles.includes('member');
 
   // Line Chart Coordinates & Path Calculations
   const lineMax = Math.max(1, ...activityChart.map((point) => point.count));
@@ -213,6 +219,293 @@ export default function Dashboard({
       <option value="year">Tahun Ini</option>
     </select>
   );
+
+  if (isInstructor && !isAdmin) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        {/* Welcome Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div>
+            <h1 className="font-serif text-3xl font-black tracking-tight text-slate-850 dark:text-white">
+              Dashboard Instruktur
+            </h1>
+            <p className="text-slate-500 dark:text-slate-455 text-sm mt-1 font-light">
+              Selamat datang kembali, <span className="font-semibold text-slate-800 dark:text-white">{userName}</span>. Mari membimbing dan melestarikan seni adat Sisawah hari ini.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20 w-fit self-start md:self-center">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_#f59e0b]"></span>
+            Instruktur Aktif
+          </div>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/85 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-[#e11d48]/40 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#e11d48]/5 rounded-bl-full pointer-events-none"></div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2">Kelas Terbimbing</span>
+              <span className="font-serif text-5xl font-black text-[#e11d48]">3 <span className="text-lg font-normal text-slate-400">Kelas</span></span>
+            </div>
+            <p className="text-xs text-slate-400 mt-4">Jadwal latihan aktif minggu ini.</p>
+          </div>
+
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/85 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-[#fbbf24]/40 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#fbbf24]/5 rounded-bl-full pointer-events-none"></div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2">Total Sasian (Murid)</span>
+              <span className="font-serif text-5xl font-black text-[#fbbf24]">24 <span className="text-lg font-normal text-slate-400">Orang</span></span>
+            </div>
+            <p className="text-xs text-slate-400 mt-4">Anggota sanggar aktif di kelas Anda.</p>
+          </div>
+
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/85 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:border-emerald-500/40 transition-all duration-300">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none"></div>
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2">Total Jam Latihan</span>
+              <span className="font-serif text-5xl font-black text-emerald-500">42 <span className="text-lg font-normal text-slate-400">Jam</span></span>
+            </div>
+            <p className="text-xs text-slate-400 mt-4">Total durasi pengajaran bulan ini.</p>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Jadwal Latihan */}
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+              <i className="fas fa-calendar-days text-[#fbbf24]"></i>
+              Jadwal Mengajar Terdekat
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#fbbf24]/50 transition-all duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-500/10 text-[#d97706] dark:text-[#fbbf24] rounded-lg text-center font-bold text-xs shrink-0 w-12">
+                    SEN
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white">Latihan Randai Utama</h4>
+                    <span className="text-xs text-slate-400"><i className="fas fa-clock mr-1"></i> 16:00 - 18:00 &bull; Gelanggang Jorong Tarok</span>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-[#fbbf24] px-2.5 py-1 bg-[#fbbf24]/10 rounded-lg">Mendatang</span>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#fbbf24]/50 transition-all duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-500/10 text-[#d97706] dark:text-[#fbbf24] rounded-lg text-center font-bold text-xs shrink-0 w-12">
+                    RAB
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white">Kelas Musik Talempong Ungah</h4>
+                    <span className="text-xs text-slate-400"><i className="fas fa-clock mr-1"></i> 15:30 - 17:30 &bull; Sasana Musik Sisawah</span>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-slate-400 px-2.5 py-1 bg-slate-100 dark:bg-white/5 rounded-lg">Rutin</span>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#fbbf24]/50 transition-all duration-300">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-amber-500/10 text-[#d97706] dark:text-[#fbbf24] rounded-lg text-center font-bold text-xs shrink-0 w-12">
+                    SAB
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-800 dark:text-white">Drama Teater Tutur Kaba</h4>
+                    <span className="text-xs text-slate-400"><i className="fas fa-clock mr-1"></i> 14:00 - 17:00 &bull; Balai Adat Kenagarian</span>
+                  </div>
+                </div>
+                <span className="text-xs font-bold text-slate-400 px-2.5 py-1 bg-slate-100 dark:bg-white/5 rounded-lg">Spesial</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions & Info */}
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+            <div>
+              <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <i className="fas fa-feather-pointed text-[#fbbf24]"></i>
+                Menu Khusus Instruktur
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <button 
+                  type="button"
+                  onClick={() => Swal.fire('Absensi Kelas', 'Fitur absensi digital sasian sedang dipersiapkan oleh admin.', 'info')}
+                  className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#fbbf24]/50 text-left transition-all duration-300 group"
+                >
+                  <i className="fas fa-clipboard-user text-amber-500 mb-2 text-xl"></i>
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Absensi Sasian</p>
+                </button>
+                
+                <button 
+                  type="button"
+                  onClick={() => Swal.fire('Nilai & Perkembangan', 'Fitur input nilai perkembangan seni/silek sedang dalam pengembangan.', 'info')}
+                  className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-500/50 text-left transition-all duration-300 group"
+                >
+                  <i className="fas fa-ranking-star text-emerald-500 mb-2 text-xl"></i>
+                  <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Input Catatan</p>
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-8 p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 text-xs text-amber-600 dark:text-amber-400 flex items-start gap-3">
+              <i className="fas fa-lightbulb text-sm shrink-0 mt-0.5"></i>
+              <p className="leading-relaxed">
+                <strong>Tips Pengajaran:</strong> Selalu mulai latihan dengan salam adat dan pemanasan silat minang minimal 15 menit untuk meregangkan otot-otot kaki dan menjaga disiplin fisik.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isMember && !isAdmin && !isInstructor) {
+    return (
+      <div className="space-y-8 animate-fade-in">
+        {/* Welcome Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+          <div>
+            <h1 className="font-serif text-3xl font-black tracking-tight text-slate-850 dark:text-white">
+              Portal Anggota
+            </h1>
+            <p className="text-slate-500 dark:text-slate-450 text-sm mt-1 font-light">
+              Selamat datang, <span className="font-semibold text-slate-800 dark:text-white">{userName}</span>! Lestarikan warisan adat dan perluas wawasan seni tradisional Anda.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 w-fit self-start md:self-center">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]"></span>
+            Anggota Aktif
+          </div>
+        </div>
+
+        {/* Member Card & Personal Info Row */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          {/* Virtual Membership Card (Premium Gold/Dark Design) */}
+          <div className="lg:col-span-5 rounded-3xl bg-gradient-to-br from-[#1e293b] via-slate-900 to-black border border-slate-800 p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden group min-h-[240px]">
+            {/* Background Accent Lines */}
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fbbf24_1px,transparent_1px)] [background-size:16px_16px]"></div>
+            <div className="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-[#fbbf24]/10 blur-3xl group-hover:bg-[#fbbf24]/20 transition-all duration-500"></div>
+            
+            <div className="flex justify-between items-start z-10">
+              <div>
+                <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#fbbf24]">KARTU KEANGGOTAAN DIGITAL</span>
+                <h4 className="font-serif text-lg font-bold text-white mt-1">SANGGAR ANTABUNG INDAH</h4>
+              </div>
+              <i className="fas fa-drum text-[#fbbf24] text-3xl opacity-80"></i>
+            </div>
+
+            <div className="my-6 z-10">
+              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block">Nama Lengkap</span>
+              <span className="text-lg font-black text-white uppercase tracking-wide">{userName}</span>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest block">Nomor Anggota</span>
+                  <span className="text-xs font-mono font-bold text-slate-300">ANTABUNG-M00{totalUsers || 7}</span>
+                </div>
+                <div>
+                  <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest block">Domisili</span>
+                  <span className="text-xs font-bold text-slate-300">Nagari Sisawah, Sijunjung</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center border-t border-slate-800/80 pt-4 z-10 text-[9px] font-bold text-slate-500 tracking-wider">
+              <span>HAK CIPTA DILINDUNGI &bull; ANTABUNG.ART</span>
+              <span className="text-[#fbbf24] uppercase">GOLD MEMBER</span>
+            </div>
+          </div>
+
+          {/* Member Quick Links */}
+          <div className="lg:col-span-7 bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-3xl p-6 flex flex-col justify-between shadow-sm">
+            <div>
+              <h3 className="text-base font-serif font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
+                <i className="fas fa-compass text-emerald-500"></i>
+                Layanan Anggota
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <Link href="/booking" className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-emerald-500/50 text-left transition-all duration-300 group">
+                  <i className="fas fa-calendar-plus text-emerald-500 mb-2 text-lg"></i>
+                  <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Booking Baru</p>
+                </Link>
+                <Link href="/jadwal" className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#fbbf24]/50 text-left transition-all duration-300 group">
+                  <i className="fas fa-calendar-check text-[#fbbf24] mb-2 text-lg"></i>
+                  <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Jadwal Latihan</p>
+                </Link>
+                <Link href="/sop" className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-purple-500/50 text-left transition-all duration-300 group">
+                  <i className="fas fa-file-shield text-purple-500 mb-2 text-lg"></i>
+                  <p className="text-[10px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Unduh SOP</p>
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-xs text-emerald-600 dark:text-emerald-400 flex items-start gap-3">
+              <i className="fas fa-bell text-sm shrink-0 mt-0.5 animate-bounce"></i>
+              <p className="leading-relaxed">
+                <strong>Informasi Sanggar:</strong> Pementasan kolosal berikutnya akan dilaksanakan pada acara Bakaua Adat Sisawah. Harap persiapkan pakaian adat dan perlengkapan latihan masing-masing.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Enrolled Classes & Bookings */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+              <i className="fas fa-graduation-cap text-[#e11d48]"></i>
+              Kelas Latihan Saya
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-[#e11d48]/10 text-[#e11d48] flex items-center justify-center shrink-0">
+                    <i className="fas fa-users-viewfinder"></i>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Randai Gelanggang Utama</h4>
+                    <span className="text-xs text-slate-400">Setiap Senin 16:00 &bull; Instruktur: Buyung Saluang</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 px-2 py-0.5 rounded bg-emerald-500/10">Aktif</span>
+              </div>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-amber-500/10 text-[#d97706] flex items-center justify-center shrink-0">
+                    <i className="fas fa-drum"></i>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Kelas Musik Etnis Canang</h4>
+                    <span className="text-xs text-slate-400">Setiap Rabu 15:30 &bull; Instruktur: Siti Rahma</span>
+                  </div>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 px-2 py-0.5 rounded bg-emerald-500/10">Aktif</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+              <i className="fas fa-file-signature text-purple-500"></i>
+              Booking Pementasan Saya
+            </h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-700 dark:text-slate-200">Pernikahan Adat (Bakaua Adat)</h4>
+                  <span className="text-xs text-slate-400"><i className="fas fa-calendar-alt mr-1"></i> 12 Sep 2026 &bull; Desa Wisata Sisawah</span>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-500 px-2.5 py-1 bg-emerald-500/10 rounded-lg">Disetujui</span>
+              </div>
+
+              <div className="flex items-center justify-center p-8 rounded-xl bg-slate-50 dark:bg-white/5 border border-dashed border-slate-200 dark:border-white/10 text-xs text-slate-400">
+                Tidak ada riwayat booking tertunda lainnya.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

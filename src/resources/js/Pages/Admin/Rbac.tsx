@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { usePage, router } from '@inertiajs/react';
-import AdminLayout from '../../Layouts/AdminLayout';
+import { router } from '@inertiajs/react';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Swal from 'sweetalert2';
@@ -23,11 +22,9 @@ interface Permission {
 interface RbacProps {
   roles: Role[];
   permissions_list: Permission[];
-  userName?: string;
-  userEmail?: string;
 }
 
-export default function Rbac({ roles, permissions_list, userName, userEmail }: RbacProps) {
+export default function Rbac({ roles, permissions_list }: RbacProps) {
   const { isDark } = useOtherTheme();
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
@@ -71,7 +68,7 @@ export default function Rbac({ roles, permissions_list, userName, userEmail }: R
       cancelButtonText: 'Batal',
       background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       color: isDark ? '#fff' : '#1e293b',
-      backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+      backdrop: `rgba(0,0,0,0.4)`,
       customClass: {
         popup: 'premium-swal-popup',
       }
@@ -94,7 +91,7 @@ export default function Rbac({ roles, permissions_list, userName, userEmail }: R
       cancelButtonText: 'Batal',
       background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       color: isDark ? '#fff' : '#1e293b',
-      backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+      backdrop: `rgba(0,0,0,0.4)`,
       customClass: {
         popup: 'premium-swal-popup',
       }

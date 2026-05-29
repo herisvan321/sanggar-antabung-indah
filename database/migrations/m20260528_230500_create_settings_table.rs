@@ -16,8 +16,8 @@ impl MigrationTrait for Migration {
             table.string("app_name").not_null();
             table.string("app_logo_name").not_null();
             table.string("meta_title").not_null();
-            table.text("meta_description").not_null();
-            table.text("footer_description").not_null();
+            table.string("meta_description").not_null();
+            table.string("footer_description").not_null();
             table.string("footer_copyright").not_null();
             table.string("created_at").nullable();
             table.string("updated_at").nullable();

@@ -18,3 +18,20 @@ pub async fn get_user_permissions(db: &AnyPool, user_id: i32) -> Vec<String> {
         
     rows.into_iter().map(|row| row.get::<String, _>("name")).collect()
 }
+
+pub async fn get_user_roles(db: &AnyPool, user_id: i32) -> Vec<String> {
+    let sql = r#"
+        SELECT r.name 
+        FROM roles r
+        JOIN model_has_roles mhr ON r.id = mhr.role_id
+        WHERE mhr.model_id = ? AND mhr.model_type = 'User'
+    "#;
+    
+    let rows = rustbasic_core::sqlx::query(sql)
+        .bind(user_id)
+        .fetch_all(db)
+        .await
+        .unwrap_or_default();
+        
+    rows.into_iter().map(|row| row.get::<String, _>("name")).collect()
+}

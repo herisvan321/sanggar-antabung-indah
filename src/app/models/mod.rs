@@ -21,3 +21,17 @@ pub mod role_has_permission;
 #[allow(unused_imports)]
 pub use role_has_permission::Entity as RoleHasPermission;
 pub mod activity_log;
+pub mod setting;
+pub mod page_section;
+
+pub mod article;
+pub mod schedule;
+pub mod program;
+pub mod metric;
+pub mod structure;
+pub mod philosophical_value;
+pub mod gallery;
+pub mod join_step;
+pub mod booking_package;
+pub mod sop_rule;
+pub mod contact_info;

@@ -12,6 +12,8 @@ impl MigratorTrait for Migrator {
             Box::new(m20260528_111646_create_rbac_tables::Migration),
             Box::new(m20260528_112335_create_activity_log_table::Migration),
             Box::new(m20260528_230500_create_settings_table::Migration),
+            Box::new(m20260529_200036_page_section::Migration),
+            Box::new(m20260529_210000_create_cms_tables::Migration),
         ]
     }
 }
@@ -25,3 +27,5 @@ pub mod m20260528_111646_create_rbac_tables;
 
 pub mod m20260528_112335_create_activity_log_table;
 pub mod m20260528_230500_create_settings_table;
+pub mod m20260529_200036_page_section;
+pub mod m20260529_210000_create_cms_tables;

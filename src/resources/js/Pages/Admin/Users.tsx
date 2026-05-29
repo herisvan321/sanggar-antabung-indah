@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { usePage, router } from '@inertiajs/react';
-import AdminLayout from '../../Layouts/AdminLayout';
+import { router } from '@inertiajs/react';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Swal from 'sweetalert2';
@@ -29,11 +28,9 @@ interface UsersProps {
   users: User[];
   roles: Role[];
   userRoles: UserRole[];
-  userName?: string;
-  userEmail?: string;
 }
 
-export default function Users({ users, roles, userRoles, userName, userEmail }: UsersProps) {
+export default function Users({ users, roles, userRoles }: UsersProps) {
   const { isDark } = useOtherTheme();
   const [showModal, setShowModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -75,7 +72,7 @@ export default function Users({ users, roles, userRoles, userName, userEmail }: 
       cancelButtonText: 'Batal',
       background: isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(255, 255, 255, 0.95)',
       color: isDark ? '#fff' : '#1e293b',
-      backdrop: `rgba(0,0,0,0.4) backdrop-filter: blur(4px)`,
+      backdrop: 'rgba(0,0,0,0.4)',
       customClass: {
         popup: 'premium-swal-popup',
       }

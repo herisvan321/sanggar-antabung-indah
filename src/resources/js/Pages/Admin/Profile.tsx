@@ -33,7 +33,7 @@ export default function Profile({ user, userName, userEmail }: ProfileProps) {
 
   return (
     <>
-      <div className="max-w-2xl mx-auto">
+      <div className="p-4">
         <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
           <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center gap-6">
             <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#e11d48] to-[#fbbf24] flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-[#e11d48]/20">

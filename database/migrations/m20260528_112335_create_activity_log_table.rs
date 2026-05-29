@@ -12,13 +12,14 @@ impl MigrationTrait for Migration {
     async fn up<'a>(&self, manager: &'a SchemaManager<'a>) -> Result<(), DbErr> {
         Schema::create(manager, "activity_log", |table| {
             table.id();
+            table.no_timestamps();
             table.string("log_name").nullable();
-            table.text("description").not_null();
+            table.string("description").not_null();
             table.string("subject_type").nullable();
             table.integer("subject_id").nullable();
             table.string("causer_type").nullable();
             table.integer("causer_id").nullable();
-            table.text("properties").nullable(); // JSON disimpan sebagai TEXT
+            table.string("properties").nullable(); // JSON disimpan sebagai VARCHAR
             table.string("created_at").nullable();
             table.string("updated_at").nullable();
         }).await
