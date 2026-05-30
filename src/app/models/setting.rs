@@ -2,7 +2,7 @@ use rustbasic_core::model;
 
 model! {
     table: "settings",
-    fillable: [app_name, app_logo_name, meta_title, meta_description, footer_description, footer_copyright, created_at, updated_at],
+    fillable: [app_name, app_logo_name, meta_title, meta_description, footer_description, footer_copyright, active_pages, created_at, updated_at],
     Model {
         pub id: i32,
         pub app_name: String,
@@ -11,6 +11,7 @@ model! {
         pub meta_description: String,
         pub footer_description: String,
         pub footer_copyright: String,
+        pub active_pages: Option<String>,
         pub created_at: Option<String>,
         pub updated_at: Option<String>,
     }

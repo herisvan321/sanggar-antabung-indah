@@ -65,4 +65,19 @@ impl SettingService {
 
         Ok(())
     }
+
+    /// Update only the active_pages field in settings
+    pub async fn update_active_pages(&self, active_pages: String) -> Result<(), rustbasic_core::sqlx::Error> {
+        let existing = self.get_settings().await?;
+        if let Some(setting) = existing {
+            let data = json!({
+                "active_pages": active_pages,
+            });
+            DB::table(&self.db, "settings")
+                .where_("id", setting.id)
+                .update(data)
+                .await?;
+        }
+        Ok(())
+    }
 }

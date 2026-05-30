@@ -37,73 +37,62 @@ pub fn router() -> Router<AppState> {
     let page_routes = Router::new()
         .route("/dashboard/pages", get(admin::page_content_controller::PageContentController::index))
         .route("/dashboard/pages", post(admin::page_content_controller::PageContentController::update))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_pages")));
+        .layer(from_fn(|req, next| permission_middleware(req, next, "halaman_pages")));
 
     let article_routes = Router::new()
-        .route("/dashboard/articles", post(admin::page_content_controller::PageContentController::store_article))
-        .route("/dashboard/articles/:id", post(admin::page_content_controller::PageContentController::update_article))
-        .route("/dashboard/articles/:id/delete", post(admin::page_content_controller::PageContentController::delete_article))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_articles")));
+        .merge(Router::new().route("/dashboard/articles", post(admin::page_content_controller::PageContentController::store_article)).layer(from_fn(|req, next| permission_middleware(req, next, "create_berita"))))
+        .merge(Router::new().route("/dashboard/articles/:id", post(admin::page_content_controller::PageContentController::update_article)).layer(from_fn(|req, next| permission_middleware(req, next, "update_berita"))))
+        .merge(Router::new().route("/dashboard/articles/:id/delete", post(admin::page_content_controller::PageContentController::delete_article)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_berita"))));
 
     let schedule_routes = Router::new()
-        .route("/dashboard/schedules", post(admin::page_content_controller::PageContentController::store_schedule))
-        .route("/dashboard/schedules/:id", post(admin::page_content_controller::PageContentController::update_schedule))
-        .route("/dashboard/schedules/:id/delete", post(admin::page_content_controller::PageContentController::delete_schedule))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_schedules")));
+        .merge(Router::new().route("/dashboard/schedules", post(admin::page_content_controller::PageContentController::store_schedule)).layer(from_fn(|req, next| permission_middleware(req, next, "create_jadwal"))))
+        .merge(Router::new().route("/dashboard/schedules/:id", post(admin::page_content_controller::PageContentController::update_schedule)).layer(from_fn(|req, next| permission_middleware(req, next, "update_jadwal"))))
+        .merge(Router::new().route("/dashboard/schedules/:id/delete", post(admin::page_content_controller::PageContentController::delete_schedule)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_jadwal"))));
 
     let program_routes = Router::new()
-        .route("/dashboard/programs", post(admin::page_content_controller::PageContentController::store_program))
-        .route("/dashboard/programs/:id", post(admin::page_content_controller::PageContentController::update_program))
-        .route("/dashboard/programs/:id/delete", post(admin::page_content_controller::PageContentController::delete_program))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_programs")));
+        .merge(Router::new().route("/dashboard/programs", post(admin::page_content_controller::PageContentController::store_program)).layer(from_fn(|req, next| permission_middleware(req, next, "create_program"))))
+        .merge(Router::new().route("/dashboard/programs/:id", post(admin::page_content_controller::PageContentController::update_program)).layer(from_fn(|req, next| permission_middleware(req, next, "update_program"))))
+        .merge(Router::new().route("/dashboard/programs/:id/delete", post(admin::page_content_controller::PageContentController::delete_program)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_program"))));
 
     let metric_routes = Router::new()
-        .route("/dashboard/metrics", post(admin::page_content_controller::PageContentController::store_metric))
-        .route("/dashboard/metrics/:id", post(admin::page_content_controller::PageContentController::update_metric))
-        .route("/dashboard/metrics/:id/delete", post(admin::page_content_controller::PageContentController::delete_metric))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_metrics")));
+        .merge(Router::new().route("/dashboard/metrics", post(admin::page_content_controller::PageContentController::store_metric)).layer(from_fn(|req, next| permission_middleware(req, next, "create_home"))))
+        .merge(Router::new().route("/dashboard/metrics/:id", post(admin::page_content_controller::PageContentController::update_metric)).layer(from_fn(|req, next| permission_middleware(req, next, "update_home"))))
+        .merge(Router::new().route("/dashboard/metrics/:id/delete", post(admin::page_content_controller::PageContentController::delete_metric)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_home"))));
 
     let structure_routes = Router::new()
-        .route("/dashboard/structures", post(admin::page_content_controller::PageContentController::store_structure))
-        .route("/dashboard/structures/:id", post(admin::page_content_controller::PageContentController::update_structure))
-        .route("/dashboard/structures/:id/delete", post(admin::page_content_controller::PageContentController::delete_structure))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_structures")));
+        .merge(Router::new().route("/dashboard/structures", post(admin::page_content_controller::PageContentController::store_structure)).layer(from_fn(|req, next| permission_middleware(req, next, "create_profil"))))
+        .merge(Router::new().route("/dashboard/structures/:id", post(admin::page_content_controller::PageContentController::update_structure)).layer(from_fn(|req, next| permission_middleware(req, next, "update_profil"))))
+        .merge(Router::new().route("/dashboard/structures/:id/delete", post(admin::page_content_controller::PageContentController::delete_structure)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_profil"))));
 
     let philosophical_routes = Router::new()
-        .route("/dashboard/philosophical_values", post(admin::page_content_controller::PageContentController::store_philosophical_value))
-        .route("/dashboard/philosophical_values/:id", post(admin::page_content_controller::PageContentController::update_philosophical_value))
-        .route("/dashboard/philosophical_values/:id/delete", post(admin::page_content_controller::PageContentController::delete_philosophical_value))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_philosophical_values")));
+        .merge(Router::new().route("/dashboard/philosophical_values", post(admin::page_content_controller::PageContentController::store_philosophical_value)).layer(from_fn(|req, next| permission_middleware(req, next, "create_filosofi"))))
+        .merge(Router::new().route("/dashboard/philosophical_values/:id", post(admin::page_content_controller::PageContentController::update_philosophical_value)).layer(from_fn(|req, next| permission_middleware(req, next, "update_filosofi"))))
+        .merge(Router::new().route("/dashboard/philosophical_values/:id/delete", post(admin::page_content_controller::PageContentController::delete_philosophical_value)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_filosofi"))));
 
     let gallery_routes = Router::new()
-        .route("/dashboard/galleries", post(admin::page_content_controller::PageContentController::store_gallery))
-        .route("/dashboard/galleries/:id", post(admin::page_content_controller::PageContentController::update_gallery))
-        .route("/dashboard/galleries/:id/delete", post(admin::page_content_controller::PageContentController::delete_gallery))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_galleries")));
+        .merge(Router::new().route("/dashboard/galleries", post(admin::page_content_controller::PageContentController::store_gallery)).layer(from_fn(|req, next| permission_middleware(req, next, "create_galeri"))))
+        .merge(Router::new().route("/dashboard/galleries/:id", post(admin::page_content_controller::PageContentController::update_gallery)).layer(from_fn(|req, next| permission_middleware(req, next, "update_galeri"))))
+        .merge(Router::new().route("/dashboard/galleries/:id/delete", post(admin::page_content_controller::PageContentController::delete_gallery)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_galeri"))));
 
     let join_step_routes = Router::new()
-        .route("/dashboard/join_steps", post(admin::page_content_controller::PageContentController::store_join_step))
-        .route("/dashboard/join_steps/:id", post(admin::page_content_controller::PageContentController::update_join_step))
-        .route("/dashboard/join_steps/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_step))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_join_steps")));
+        .merge(Router::new().route("/dashboard/join_steps", post(admin::page_content_controller::PageContentController::store_join_step)).layer(from_fn(|req, next| permission_middleware(req, next, "create_join"))))
+        .merge(Router::new().route("/dashboard/join_steps/:id", post(admin::page_content_controller::PageContentController::update_join_step)).layer(from_fn(|req, next| permission_middleware(req, next, "update_join"))))
+        .merge(Router::new().route("/dashboard/join_steps/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_step)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_join"))));
 
     let booking_package_routes = Router::new()
-        .route("/dashboard/booking_packages", post(admin::page_content_controller::PageContentController::store_booking_package))
-        .route("/dashboard/booking_packages/:id", post(admin::page_content_controller::PageContentController::update_booking_package))
-        .route("/dashboard/booking_packages/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_package))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_booking_packages")));
+        .merge(Router::new().route("/dashboard/booking_packages", post(admin::page_content_controller::PageContentController::store_booking_package)).layer(from_fn(|req, next| permission_middleware(req, next, "create_booking"))))
+        .merge(Router::new().route("/dashboard/booking_packages/:id", post(admin::page_content_controller::PageContentController::update_booking_package)).layer(from_fn(|req, next| permission_middleware(req, next, "update_booking"))))
+        .merge(Router::new().route("/dashboard/booking_packages/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_package)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_booking"))));
 
     let sop_rule_routes = Router::new()
-        .route("/dashboard/sop_rules", post(admin::page_content_controller::PageContentController::store_sop_rule))
-        .route("/dashboard/sop_rules/:id", post(admin::page_content_controller::PageContentController::update_sop_rule))
-        .route("/dashboard/sop_rules/:id/delete", post(admin::page_content_controller::PageContentController::delete_sop_rule))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_sop_rules")));
+        .merge(Router::new().route("/dashboard/sop_rules", post(admin::page_content_controller::PageContentController::store_sop_rule)).layer(from_fn(|req, next| permission_middleware(req, next, "create_sop"))))
+        .merge(Router::new().route("/dashboard/sop_rules/:id", post(admin::page_content_controller::PageContentController::update_sop_rule)).layer(from_fn(|req, next| permission_middleware(req, next, "update_sop"))))
+        .merge(Router::new().route("/dashboard/sop_rules/:id/delete", post(admin::page_content_controller::PageContentController::delete_sop_rule)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_sop"))));
 
     let contact_info_routes = Router::new()
-        .route("/dashboard/contact_infos", post(admin::page_content_controller::PageContentController::store_contact_info))
-        .route("/dashboard/contact_infos/:id", post(admin::page_content_controller::PageContentController::update_contact_info))
-        .route("/dashboard/contact_infos/:id/delete", post(admin::page_content_controller::PageContentController::delete_contact_info))
-        .layer(from_fn(|req, next| permission_middleware(req, next, "manage_contact_infos")));
+        .merge(Router::new().route("/dashboard/contact_infos", post(admin::page_content_controller::PageContentController::store_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "create_kontak"))))
+        .merge(Router::new().route("/dashboard/contact_infos/:id", post(admin::page_content_controller::PageContentController::update_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "update_kontak"))))
+        .merge(Router::new().route("/dashboard/contact_infos/:id/delete", post(admin::page_content_controller::PageContentController::delete_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_kontak"))));
 
     let dashboard_route = Router::new()
         .route("/dashboard", get(dashboard_controller::DashboardController::index))

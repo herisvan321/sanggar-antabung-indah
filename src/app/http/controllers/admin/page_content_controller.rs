@@ -15,6 +15,7 @@ use crate::app::services::join_step_service::JoinStepService;
 use crate::app::services::booking_package_service::BookingPackageService;
 use crate::app::services::sop_rule_service::SopRuleService;
 use crate::app::services::contact_info_service::ContactInfoService;
+use crate::app::services::setting_service::SettingService;
 
 use crate::app::models::users;
 use crate::app::http::controllers::admin::helper::get_user_permissions;
@@ -56,6 +57,22 @@ pub struct PageSectionUpdateRequest {
 impl Validate for PageSectionUpdateRequest {
     fn validate(&self) -> Result<(), HashMap<String, String>> {
         Ok(())
+    }
+}
+
+// Active Pages Update
+#[derive(Deserialize)]
+pub struct ActivePagesUpdateRequest {
+    pub active_pages: String,
+}
+
+impl Validate for ActivePagesUpdateRequest {
+    fn validate(&self) -> Result<(), HashMap<String, String>> {
+        let mut errs = HashMap::new();
+        if self.active_pages.trim().is_empty() {
+            errs.insert("active_pages".to_string(), "Status aktif tidak boleh kosong".to_string());
+        }
+        if errs.is_empty() { Ok(()) } else { Err(errs) }
     }
 }
 
@@ -389,6 +406,21 @@ impl PageContentController {
         ).await {
             Ok(_) => { req.session.set("success", "Section halaman berhasil diperbarui"); }
             Err(e) => { req.session.set("error", format!("Gagal memperbarui section: {}", e)); }
+        }
+
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    pub async fn update_active_pages(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let data = match req.validate::<ActivePagesUpdateRequest>() {
+            Ok(d) => d,
+            Err(_) => return Redirect::to("/dashboard/pages").into_response(),
+        };
+
+        let service = SettingService::new(state.db.clone());
+        match service.update_active_pages(data.active_pages).await {
+            Ok(_) => { req.session.set("success", "Status aktivasi halaman berhasil diperbarui"); }
+            Err(e) => { req.session.set("error", format!("Gagal memperbarui status aktivasi: {}", e)); }
         }
 
         Redirect::to("/dashboard/pages").into_response()

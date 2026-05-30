@@ -108,7 +108,7 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
 
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: 'fa-chart-line', permission: 'view_dashboard' },
-    { name: 'Manajemen Halaman', href: '/dashboard/pages', icon: 'fa-file-invoice', permission: 'manage_pages' },
+    { name: 'Manajemen Halaman', href: '/dashboard/pages', icon: 'fa-file-invoice', permission: 'halaman_pages' },
     { name: 'Pengaturan', href: '/dashboard/settings', icon: 'fa-gear', permission: 'manage_settings' },
   ];
 

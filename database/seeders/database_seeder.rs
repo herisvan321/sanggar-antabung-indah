@@ -16,23 +16,36 @@ seeder! {
         // 1. Seed Permissions
         let permissions = vec![
             ("manage_users", "web"),
-            ("manage_schedules", "web"),
+            ("halaman_jadwal", "web"),
             ("manage_bookings", "web"),
             ("view_dashboard", "web"),
             ("manage_roles", "web"),
             ("manage_permissions", "web"),
             ("manage_settings", "web"),
-            ("manage_pages", "web"),
-            ("manage_articles", "web"),
-            ("manage_programs", "web"),
-            ("manage_metrics", "web"),
-            ("manage_structures", "web"),
-            ("manage_philosophical_values", "web"),
-            ("manage_galleries", "web"),
-            ("manage_join_steps", "web"),
-            ("manage_booking_packages", "web"),
-            ("manage_sop_rules", "web"),
-            ("manage_contact_infos", "web"),
+            ("halaman_pages", "web"),
+            ("halaman_berita", "web"),
+            ("halaman_program", "web"),
+            ("halaman_home", "web"),
+            ("halaman_profil", "web"),
+            ("halaman_filosofi", "web"),
+            ("halaman_galeri", "web"),
+            ("halaman_join", "web"),
+            ("halaman_booking", "web"),
+            ("halaman_sop", "web"),
+            ("halaman_kontak", "web"),
+
+            // CRUD Permissions
+            ("create_berita", "web"), ("update_berita", "web"), ("delete_berita", "web"),
+            ("create_jadwal", "web"), ("update_jadwal", "web"), ("delete_jadwal", "web"),
+            ("create_program", "web"), ("update_program", "web"), ("delete_program", "web"),
+            ("create_home", "web"), ("update_home", "web"), ("delete_home", "web"),
+            ("create_profil", "web"), ("update_profil", "web"), ("delete_profil", "web"),
+            ("create_filosofi", "web"), ("update_filosofi", "web"), ("delete_filosofi", "web"),
+            ("create_galeri", "web"), ("update_galeri", "web"), ("delete_galeri", "web"),
+            ("create_join", "web"), ("update_join", "web"), ("delete_join", "web"),
+            ("create_booking", "web"), ("update_booking", "web"), ("delete_booking", "web"),
+            ("create_sop", "web"), ("update_sop", "web"), ("delete_sop", "web"),
+            ("create_kontak", "web"), ("update_kontak", "web"), ("delete_kontak", "web"),
         ];
 
         let mut permission_ids = std::collections::HashMap::new();
@@ -131,13 +144,29 @@ seeder! {
         // 3. Assign Permissions to Roles (role_has_permissions)
         let role_permissions = vec![
             ("admin", vec![
-                "manage_users", "manage_schedules", "manage_bookings", "view_dashboard",
-                "manage_roles", "manage_permissions", "manage_settings", "manage_pages",
-                "manage_articles", "manage_programs", "manage_metrics", "manage_structures",
-                "manage_philosophical_values", "manage_galleries", "manage_join_steps",
-                "manage_booking_packages", "manage_sop_rules", "manage_contact_infos"
+                "manage_users", "halaman_jadwal", "manage_bookings", "view_dashboard",
+                "manage_roles", "manage_permissions", "manage_settings", "halaman_pages",
+                "halaman_berita", "halaman_program", "halaman_home", "halaman_profil",
+                "halaman_filosofi", "halaman_galeri", "halaman_join",
+                "halaman_booking", "halaman_sop", "halaman_kontak",
+                
+                // CRUD Permissions for Admin
+                "create_berita", "update_berita", "delete_berita",
+                "create_jadwal", "update_jadwal", "delete_jadwal",
+                "create_program", "update_program", "delete_program",
+                "create_home", "update_home", "delete_home",
+                "create_profil", "update_profil", "delete_profil",
+                "create_filosofi", "update_filosofi", "delete_filosofi",
+                "create_galeri", "update_galeri", "delete_galeri",
+                "create_join", "update_join", "delete_join",
+                "create_booking", "update_booking", "delete_booking",
+                "create_sop", "update_sop", "delete_sop",
+                "create_kontak", "update_kontak", "delete_kontak"
             ]),
-            ("instructor", vec!["manage_schedules", "view_dashboard"]),
+            ("instructor", vec![
+                "halaman_jadwal", "view_dashboard",
+                "create_jadwal", "update_jadwal", "delete_jadwal"
+            ]),
             ("member", vec!["view_dashboard"]),
         ];
 
@@ -253,6 +282,7 @@ seeder! {
                 "meta_description": "Sanggar Antabung Indah - Digitalisasi Kesenian Randai, Tari Pijak Galeh, dan Musik Talempong Ungah khas Kenagarian Sisawah, Sumpur Kudus, Sijunjung.",
                 "footer_description": "Pusat Pelestarian Kesenian Tradisional Randai & Kaba khas Nagari Wisata Sisawah, Kecamatan Sumpur Kudus, Kabupaten Sijunjung, Sumatera Barat.",
                 "footer_copyright": "2026 SANGGAR ANTABUNG INDAH",
+                "active_pages": "{\"home\":true,\"profil\":true,\"filosofi\":true,\"galeri\":true,\"jadwal\":true,\"program\":true,\"join\":true,\"berita\":true,\"booking\":true,\"kontak\":true,\"sop\":true}",
                 "created_at": rustbasic_core::chrono::Local::now().naive_local().format("%Y-%m-%d %H:%M:%S").to_string(),
                 "updated_at": rustbasic_core::chrono::Local::now().naive_local().format("%Y-%m-%d %H:%M:%S").to_string(),
             })).await;

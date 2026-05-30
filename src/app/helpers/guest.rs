@@ -11,6 +11,15 @@ pub fn render_guest(req: &Request, component: &str, mut props: Value) -> rustbas
         if !map.contains_key("is_logged_in") {
             map.insert("is_logged_in".to_string(), json!(is_logged_in));
         }
+        if is_logged_in {
+            let db = req.state.db.clone();
+            let permissions = tokio::task::block_in_place(|| {
+                tokio::runtime::Handle::current().block_on(async {
+                    crate::app::http::controllers::admin::helper::get_user_permissions(&db, user_id).await
+                })
+            });
+            map.insert("permissions".to_string(), json!(permissions));
+        }
     }
     
     inertia(req, component, props)

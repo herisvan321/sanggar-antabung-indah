@@ -10,7 +10,18 @@ function LayoutContent({ children }: OtherLayoutProps) {
   const { theme, toggleTheme, isFullscreen, toggleFullscreen, toastOpen, toastMessage } = useOtherTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { props, url } = usePage<any>();
-  const { settings, is_logged_in } = props;
+  const { settings, is_logged_in, permissions = [] } = props;
+
+  const isPageVisible = (tab: string) => {
+    if (activePages[tab] === false) return false;
+    if (is_logged_in) {
+      const requiredPermission = `halaman_${tab}`;
+      if (!permissions.includes(requiredPermission)) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   const settingsData = settings || {
     app_name: "Sanggar Antabung Indah",
@@ -20,6 +31,29 @@ function LayoutContent({ children }: OtherLayoutProps) {
     footer_description: "Pusat Pelestarian Kesenian Tradisional Randai & Kaba khas Nagari Wisata Sisawah, Kecamatan Sumpur Kudus, Kabupaten Sijunjung, Sumatera Barat.",
     footer_copyright: "2026 SANGGAR ANTABUNG INDAH"
   };
+
+  const activePages = (() => {
+    try {
+      if (settingsData.active_pages) {
+        return JSON.parse(settingsData.active_pages);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return {
+      home: true,
+      profil: true,
+      filosofi: true,
+      galeri: true,
+      jadwal: true,
+      program: true,
+      join: true,
+      berita: true,
+      booking: true,
+      kontak: true,
+      sop: true
+    };
+  })();
 
   const path = url.split('?')[0];
   let activeTab: 'home' | 'profil' | 'filosofi' | 'galeri' | 'jadwal' | 'program' | 'join' | 'berita' | 'booking' | 'kontak' | 'sop' = 'home';
@@ -86,7 +120,7 @@ function LayoutContent({ children }: OtherLayoutProps) {
           
           {/* Desktop Menu Links */}
           <ul className="hidden lg:flex items-center gap-1">
-            {(['home', 'profil', 'filosofi', 'galeri', 'jadwal', 'program', 'join', 'berita', 'booking', 'sop', 'kontak'] as const).map(tab => {
+            {(['home', 'profil', 'filosofi', 'galeri', 'jadwal', 'program', 'join', 'berita', 'booking', 'sop', 'kontak'] as const).filter(isPageVisible).map(tab => {
               const href = tab === 'home' ? '/' : `/${tab}`;
               return (
                 <li key={tab}>
@@ -167,7 +201,7 @@ function LayoutContent({ children }: OtherLayoutProps) {
               Masuk
             </Link>
           )}
-          {(['home', 'profil', 'filosofi', 'galeri', 'jadwal', 'program', 'join', 'berita', 'booking', 'sop', 'kontak'] as const).map(tab => {
+          {(['home', 'profil', 'filosofi', 'galeri', 'jadwal', 'program', 'join', 'berita', 'booking', 'sop', 'kontak'] as const).filter(isPageVisible).map(tab => {
             const href = tab === 'home' ? '/' : `/${tab}`;
             return (
               <Link 
@@ -187,7 +221,7 @@ function LayoutContent({ children }: OtherLayoutProps) {
 
       {/* MOBILE BOTTOM TAB BAR */}
       <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden bg-white/90 dark:bg-[#141417]/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] px-2 py-2.5 flex justify-around items-center">
-        {(['home', 'profil', 'galeri', 'booking'] as const).map(tab => {
+        {(['home', 'profil', 'galeri', 'booking'] as const).filter(isPageVisible).map(tab => {
           const href = tab === 'home' ? '/' : `/${tab}`;
           return (
             <Link 

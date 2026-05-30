@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import DataTable from 'datatables.net-react';
 import DT from 'datatables.net-dt';
 import Swal from 'sweetalert2';
@@ -120,6 +120,8 @@ export default function Dashboard({
   const isAdmin = roles.includes('admin') || roles.length === 0;
   const isInstructor = roles.includes('instructor');
   const isMember = roles.includes('member');
+  const { props } = usePage<any>();
+  const userPermissions = props.permissions || [];
 
   // Line Chart Coordinates & Path Calculations
   const lineMax = Math.max(1, ...activityChart.map((point) => point.count));
@@ -558,23 +560,33 @@ export default function Dashboard({
         </div>
       </div>
 
- {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm">
-          <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
-            <i className="fas fa-bolt text-[#fbbf24]"></i>
-            Aksi Cepat
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/dashboard/users" className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-[#e11d48]/50 transition-all duration-300 group">
-              <i className="fas fa-user-plus text-[#e11d48] mb-2 text-xl"></i>
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Tambah User</p>
-            </Link>
-            <Link href="/dashboard/rbac" className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:border-amber-500/50 transition-all duration-300 group">
-              <i className="fas fa-key text-amber-500 mb-2 text-xl"></i>
-              <p className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">Kelola Role</p>
-            </Link>
-          </div>
+  {/* Quick Actions */}
+      <div className="bg-white dark:bg-white/[0.02] border border-slate-200 dark:border-slate-800/80 rounded-2xl p-6 shadow-sm">
+        <h3 className="text-lg font-serif font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+          <i className="fas fa-bolt text-[#fbbf24]"></i>
+          Aksi Cepat
+        </h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          {[
+            { name: 'Tambah User', href: '/dashboard/users', icon: 'fa-user-plus', colorClass: 'text-[#e11d48]', hoverBorder: 'hover:border-[#e11d48]/50', permission: 'manage_users' },
+            { name: 'Kelola Role', href: '/dashboard/rbac', icon: 'fa-key', colorClass: 'text-amber-500', hoverBorder: 'hover:border-amber-500/50', permission: 'manage_roles' },
+            { name: 'Matriks Akses', href: '/dashboard/matrix', icon: 'fa-table-cells', colorClass: 'text-cyan-500', hoverBorder: 'hover:border-cyan-500/50', permission: 'manage_permissions' },
+            { name: 'Edit Konten', href: '/dashboard/pages', icon: 'fa-file-invoice', colorClass: 'text-emerald-500', hoverBorder: 'hover:border-emerald-500/50', permission: 'halaman_pages' },
+            { name: 'Pengaturan Web', href: '/dashboard/settings', icon: 'fa-gear', colorClass: 'text-purple-500', hoverBorder: 'hover:border-purple-500/50', permission: 'manage_settings' },
+            { name: 'Profil Saya', href: '/dashboard/profile', icon: 'fa-user-gear', colorClass: 'text-blue-500', hoverBorder: 'hover:border-blue-500/50', permission: '' },
+            { name: 'Web Publik', href: '/', icon: 'fa-globe', colorClass: 'text-pink-500', hoverBorder: 'hover:border-pink-500/50', permission: '' }
+          ]
+            .filter(action => !action.permission || userPermissions.includes(action.permission))
+            .map((action, idx) => (
+              <Link 
+                key={idx}
+                href={action.href} 
+                className={`p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 ${action.hoverBorder} transition-all duration-300 group flex flex-col items-center justify-center text-center`}
+              >
+                <i className={`fas ${action.icon} ${action.colorClass} mb-2 text-xl group-hover:scale-110 transition-transform duration-300`}></i>
+                <p className="text-[10px] sm:text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wider">{action.name}</p>
+              </Link>
+            ))}
         </div>
       </div>
       {/* Activity Overview */}

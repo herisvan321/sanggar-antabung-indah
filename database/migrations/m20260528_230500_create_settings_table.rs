@@ -19,6 +19,7 @@ impl MigrationTrait for Migration {
             table.string("meta_description").not_null();
             table.string("footer_description").not_null();
             table.string("footer_copyright").not_null();
+            table.string("active_pages").nullable();
             table.string("created_at").nullable();
             table.string("updated_at").nullable();
         }).await

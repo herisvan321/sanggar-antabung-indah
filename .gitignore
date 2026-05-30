@@ -14,3 +14,5 @@ list.md
 .rustbasic_session
 report*.md
 .rustbasic_packages.json
+/deploy
+deploy.zip

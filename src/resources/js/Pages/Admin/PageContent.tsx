@@ -32,6 +32,7 @@ interface PageContentProps {
   userEmail?: string;
   permissions: string[];
   errors?: Record<string, string>;
+  settings?: any;
 }
 
 const PAGE_SECTIONS_MAP: Record<string, { label: string; sections: { key: string; label: string }[] }> = {
@@ -108,6 +109,20 @@ const PAGE_SECTIONS_MAP: Record<string, { label: string; sections: { key: string
   }
 };
 
+const PAGES_METADATA = [
+  { key: 'home', label: 'Beranda / Home', path: '/', icon: 'fa-home' },
+  { key: 'profil', label: 'Profil Sanggar', path: '/profil', icon: 'fa-users' },
+  { key: 'filosofi', label: 'Filosofi & Makna', path: '/filosofi', icon: 'fa-lightbulb' },
+  { key: 'galeri', label: 'Galeri Foto', path: '/galeri', icon: 'fa-images' },
+  { key: 'jadwal', label: 'Jadwal Kegiatan', path: '/jadwal', icon: 'fa-calendar-alt' },
+  { key: 'program', label: 'Program & Layanan', path: '/program', icon: 'fa-rocket' },
+  { key: 'join', label: 'Gabung Anggota', path: '/join', icon: 'fa-user-plus' },
+  { key: 'berita', label: 'Berita / Warta', path: '/berita', icon: 'fa-newspaper' },
+  { key: 'booking', label: 'Booking & Reservasi', path: '/booking', icon: 'fa-file-signature' },
+  { key: 'sop', label: 'Standar Operasional (SOP)', path: '/sop', icon: 'fa-clipboard-list' },
+  { key: 'kontak', label: 'Hubungi Kami', path: '/kontak', icon: 'fa-address-book' }
+];
+
 export default function PageContent({
   sections,
   articles,
@@ -121,36 +136,85 @@ export default function PageContent({
   booking_packages,
   sop_rules,
   contact_infos,
-  permissions = []
+  permissions = [],
+  settings
 }: PageContentProps) {
   
   const collectionPerms = [
-    'manage_articles', 'manage_schedules', 'manage_programs', 'manage_metrics',
-    'manage_structures', 'manage_philosophical_values', 'manage_galleries',
-    'manage_join_steps', 'manage_booking_packages', 'manage_sop_rules', 'manage_contact_infos'
+    'halaman_berita', 'halaman_jadwal', 'halaman_program', 'halaman_home',
+    'halaman_profil', 'halaman_filosofi', 'halaman_galeri',
+    'halaman_join', 'halaman_booking', 'halaman_sop', 'halaman_kontak'
   ];
   const hasAnyCollectionPermission = collectionPerms.some(perm => permissions.includes(perm));
 
-  const [activeTab, setActiveTab] = useState<'sections' | 'collections'>(
-    permissions.includes('manage_pages') ? 'sections' : 'collections'
+  const [activeTab, setActiveTab] = useState<'sections' | 'collections' | 'active_pages'>(
+    permissions.includes('halaman_pages') ? 'sections' : 'collections'
   );
   const [selectedPage, setSelectedPage] = useState('home');
   const [selectedSection, setSelectedSection] = useState('hero');
   
+  const [activePagesMap, setActivePagesMap] = useState<Record<string, boolean>>(() => {
+    try {
+      if (settings?.active_pages) {
+        return JSON.parse(settings.active_pages);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return {
+      home: true,
+      profil: true,
+      filosofi: true,
+      galeri: true,
+      jadwal: true,
+      program: true,
+      join: true,
+      berita: true,
+      booking: true,
+      kontak: true,
+      sop: true
+    };
+  });
+
+  const handleTogglePage = (pageKey: string) => {
+    setActivePagesMap(prev => ({
+      ...prev,
+      [pageKey]: !prev[pageKey]
+    }));
+  };
+
+  const handleActivePagesSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    router.post('/dashboard/pages/active-pages', {
+      active_pages: JSON.stringify(activePagesMap)
+    }, {
+      onSuccess: () => {
+        setIsSubmitting(false);
+        Swal.fire({ icon: 'success', title: 'Berhasil', text: 'Status aktivasi halaman berhasil disimpan!', timer: 1500, showConfirmButton: false });
+      },
+      onError: (err) => {
+        setIsSubmitting(false);
+        Swal.fire('Gagal', err?.error || 'Gagal menyimpan status aktivasi', 'error');
+      }
+    });
+  };
+
   // Find the first collection the user has permission to manage
   const getFirstAllowedCollection = () => {
     const list = [
-      { key: 'articles', perm: 'manage_articles' },
-      { key: 'schedules', perm: 'manage_schedules' },
-      { key: 'programs', perm: 'manage_programs' },
-      { key: 'metrics', perm: 'manage_metrics' },
-      { key: 'structures', perm: 'manage_structures' },
-      { key: 'philosophical_values', perm: 'manage_philosophical_values' },
-      { key: 'galleries', perm: 'manage_galleries' },
-      { key: 'join_steps', perm: 'manage_join_steps' },
-      { key: 'booking_packages', perm: 'manage_booking_packages' },
-      { key: 'sop_rules', perm: 'manage_sop_rules' },
-      { key: 'contact_infos', perm: 'manage_contact_infos' }
+      { key: 'articles', perm: 'halaman_berita' },
+      { key: 'schedules', perm: 'halaman_jadwal' },
+      { key: 'programs', perm: 'halaman_program' },
+      { key: 'metrics', perm: 'halaman_home' },
+      { key: 'structures', perm: 'halaman_profil' },
+      { key: 'philosophical_values', perm: 'halaman_filosofi' },
+      { key: 'galleries', perm: 'halaman_galeri' },
+      { key: 'join_steps', perm: 'halaman_join' },
+      { key: 'booking_packages', perm: 'halaman_booking' },
+      { key: 'sop_rules', perm: 'halaman_sop' },
+      { key: 'contact_infos', perm: 'halaman_kontak' }
     ];
     const allowed = list.find(col => permissions.includes(col.perm));
     return allowed ? allowed.key : 'articles';
@@ -374,6 +438,34 @@ export default function PageContent({
   // Helper check for permission
   const hasPermission = (perm: string) => permissions.includes(perm);
 
+  const getCRUDPermissions = (collection: string) => {
+    let base = '';
+    switch (collection) {
+      case 'articles': base = 'berita'; break;
+      case 'schedules': base = 'jadwal'; break;
+      case 'programs': base = 'program'; break;
+      case 'metrics': base = 'home'; break;
+      case 'structures': base = 'profil'; break;
+      case 'philosophical_values': base = 'filosofi'; break;
+      case 'galleries': base = 'galeri'; break;
+      case 'join_steps': base = 'join'; break;
+      case 'booking_packages': base = 'booking'; break;
+      case 'sop_rules': base = 'sop'; break;
+      case 'contact_infos': base = 'kontak'; break;
+      default: base = collection; break;
+    }
+    return {
+      create: `create_${base}`,
+      update: `update_${base}`,
+      delete: `delete_${base}`
+    };
+  };
+
+  const { create: createPerm, update: updatePerm, delete: deletePerm } = getCRUDPermissions(activeCollection);
+  const canCreate = hasPermission(createPerm);
+  const canUpdate = hasPermission(updatePerm);
+  const canDelete = hasPermission(deletePerm);
+
   // Fetch items list for active collection tab
   const getActiveCollectionData = () => {
     switch (activeCollection) {
@@ -398,7 +490,7 @@ export default function PageContent({
     <div className="p-4">
       {/* Tab Navigation */}
       <div className="flex border-b border-slate-200 dark:border-slate-800 mb-4">
-        {hasPermission('manage_pages') && (
+        {hasPermission('halaman_pages') && (
           <button
             onClick={() => setActiveTab('sections')}
             className={`py-3 px-6 text-sm font-bold border-b-2 transition-all ${
@@ -422,9 +514,21 @@ export default function PageContent({
             🗂️ Kelola Koleksi Data (Normalized)
           </button>
         )}
+        {hasPermission('halaman_pages') && (
+          <button
+            onClick={() => setActiveTab('active_pages')}
+            className={`py-3 px-6 text-sm font-bold border-b-2 transition-all ${
+              activeTab === 'active_pages' 
+                ? 'border-[#e11d48] text-[#e11d48]' 
+                : 'border-transparent text-slate-400 hover:text-slate-600'
+            }`}
+          >
+            ⚙️ Status Aktivasi Halaman
+          </button>
+        )}
       </div>
 
-      {activeTab === 'sections' && hasPermission('manage_pages') ? (
+      {activeTab === 'sections' && hasPermission('halaman_pages') ? (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xl p-4">
           <div className="p-8 border-b border-slate-100 dark:border-slate-800/60 flex flex-wrap items-center justify-between gap-6">
             <div className="flex items-center gap-6">
@@ -556,17 +660,17 @@ export default function PageContent({
             <div className="space-y-2 lg:col-span-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl h-fit">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Pilih Koleksi Data</h4>
               {[
-                { key: 'articles', label: '📰 Berita & Warta', perm: 'manage_articles' },
-                { key: 'schedules', label: '📅 Agenda & Latihan', perm: 'manage_schedules' },
-                { key: 'programs', label: '🚀 Layanan & Program', perm: 'manage_programs' },
-                { key: 'metrics', label: '📊 Statistik & Metrik', perm: 'manage_metrics' },
-                { key: 'structures', label: '👥 Pengurus & Adat', perm: 'manage_structures' },
-                { key: 'philosophical_values', label: '💡 Nilai Filosofi', perm: 'manage_philosophical_values' },
-                { key: 'galleries', label: '🖼️ Galeri Foto', perm: 'manage_galleries' },
-                { key: 'join_steps', label: '👣 Syarat & Gabung', perm: 'manage_join_steps' },
-                { key: 'booking_packages', label: '📦 Paket Reservasi', perm: 'manage_booking_packages' },
-                { key: 'sop_rules', label: '📜 Aturan SOP', perm: 'manage_sop_rules' },
-                { key: 'contact_infos', label: '📞 Informasi Kontak', perm: 'manage_contact_infos' }
+                { key: 'articles', label: '📰 Berita & Warta', perm: 'halaman_berita' },
+                { key: 'schedules', label: '📅 Agenda & Latihan', perm: 'halaman_jadwal' },
+                { key: 'programs', label: '🚀 Layanan & Program', perm: 'halaman_program' },
+                { key: 'metrics', label: '📊 Statistik & Metrik', perm: 'halaman_home' },
+                { key: 'structures', label: '👥 Pengurus & Adat', perm: 'halaman_profil' },
+                { key: 'philosophical_values', label: '💡 Nilai Filosofi', perm: 'halaman_filosofi' },
+                { key: 'galleries', label: '🖼️ Galeri Foto', perm: 'halaman_galeri' },
+                { key: 'join_steps', label: '👣 Syarat & Gabung', perm: 'halaman_join' },
+                { key: 'booking_packages', label: '📦 Paket Reservasi', perm: 'halaman_booking' },
+                { key: 'sop_rules', label: '📜 Aturan SOP', perm: 'halaman_sop' },
+                { key: 'contact_infos', label: '📞 Informasi Kontak', perm: 'halaman_kontak' }
               ].map((col) => {
                 if (!hasPermission(col.perm)) return null;
                 return (
@@ -595,12 +699,14 @@ export default function PageContent({
                   </h3>
                   <p className="text-xs text-slate-400">Total data: {collectionData.length} records</p>
                 </div>
-                <button
-                  onClick={openCreateModal}
-                  className="px-4 py-2 bg-[#e11d48] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#be123c] transition-all"
-                >
-                  + Tambah Data
-                </button>
+                {canCreate && (
+                  <button
+                    onClick={openCreateModal}
+                    className="px-4 py-2 bg-[#e11d48] text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-[#be123c] transition-all"
+                  >
+                    + Tambah Data
+                  </button>
+                )}
               </div>
 
               {/* Data Table */}
@@ -800,20 +906,23 @@ export default function PageContent({
                             </>
                           )}
 
-                          {/* Actions */}
                           <td className="py-3 px-4 text-right space-x-2 shrink-0">
-                            <button
-                              onClick={() => openEditModal(item)}
-                              className="px-2.5 py-1.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-lg text-[10px] font-bold"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleCollectionDelete(item.id)}
-                              className="px-2.5 py-1.5 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-lg text-[10px] font-bold"
-                            >
-                              Hapus
-                            </button>
+                            {canUpdate && (
+                              <button
+                                onClick={() => openEditModal(item)}
+                                className="px-2.5 py-1.5 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-lg text-[10px] font-bold"
+                              >
+                                Edit
+                              </button>
+                            )}
+                            {canDelete && (
+                              <button
+                                onClick={() => handleCollectionDelete(item.id)}
+                                className="px-2.5 py-1.5 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 rounded-lg text-[10px] font-bold"
+                              >
+                                Hapus
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))
@@ -824,6 +933,88 @@ export default function PageContent({
             </div>
           </div>
         )
+      )}
+
+      {activeTab === 'active_pages' && hasPermission('halaman_pages') && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-xl p-8">
+          <div className="border-b border-slate-100 dark:border-slate-800/60 pb-6 mb-8 flex items-center gap-6">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e11d48] to-[#fbbf24] flex items-center justify-center text-white text-xl font-black">
+              <i className="fas fa-toggle-on"></i>
+            </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-slate-800 dark:text-white">Status Aktivasi Halaman & Menu</h3>
+              <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest font-bold">Aktifkan atau nonaktifkan halaman di menu utama dan luar</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleActivePagesSubmit} className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {PAGES_METADATA.map((page) => {
+                const hasPagePerm = hasPermission(`halaman_${page.key}`);
+                return (
+                  <div 
+                    key={page.key} 
+                    className={`p-5 rounded-2xl border bg-slate-50/50 dark:bg-white/[0.02] flex items-center justify-between hover:shadow-md transition-all duration-300 group ${
+                      hasPagePerm 
+                        ? 'border-slate-200 dark:border-slate-800/80 hover:border-[#e11d48]/40' 
+                        : 'border-slate-250 dark:border-slate-800/40 opacity-70'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors ${
+                        hasPagePerm ? 'group-hover:bg-[#e11d48]/10 group-hover:text-[#e11d48]' : ''
+                      }`}>
+                        <i className={`fas ${page.icon} text-lg`}></i>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-sm text-slate-800 dark:text-white">{page.label}</h4>
+                          {!hasPagePerm && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-500/10 text-amber-500 border border-amber-500/25 flex items-center gap-1 font-semibold">
+                              <i className="fas fa-lock text-[8px]"></i> Terkunci
+                            </span>
+                          )}
+                        </div>
+                        <p className="font-mono text-[10px] text-slate-400 mt-0.5">{page.path}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={!hasPagePerm}
+                        onClick={() => handleTogglePage(page.key)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 focus:outline-none shrink-0 ${
+                          !hasPagePerm 
+                            ? 'bg-slate-200 dark:bg-slate-850 cursor-not-allowed'
+                            : activePagesMap[page.key] 
+                              ? 'bg-[#e11d48]' 
+                              : 'bg-slate-300 dark:bg-slate-700'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                            activePagesMap[page.key] ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800/60">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-3 bg-[#e11d48] text-white font-bold text-xs uppercase tracking-wider rounded-xl hover:bg-[#be123c] transition-all shadow-md hover:shadow-lg"
+              >
+                {isSubmitting ? 'Menyimpan...' : 'Simpan Status Aktivasi'}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       {/* Modal CRUD Collections */}

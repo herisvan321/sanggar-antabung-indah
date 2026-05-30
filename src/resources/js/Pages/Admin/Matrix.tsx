@@ -1,6 +1,5 @@
 import React from 'react';
-import { usePage, router } from '@inertiajs/react';
-import AdminLayout from '../../Layouts/AdminLayout';
+import { router } from '@inertiajs/react';
 
 interface Role {
   id: number;
@@ -22,11 +21,9 @@ interface MatrixProps {
   roles: Role[];
   permissions_list: Permission[];
   relations: Relation[];
-  userName?: string;
-  userEmail?: string;
 }
 
-export default function Matrix({ roles, permissions_list, relations, userName, userEmail }: MatrixProps) {
+export default function Matrix({ roles, permissions_list, relations }: MatrixProps) {
   const hasPermission = (roleId: number, permissionId: number) => {
     return relations.some(rel => rel.role_id === roleId && rel.permission_id === permissionId);
   };
@@ -39,6 +36,63 @@ export default function Matrix({ roles, permissions_list, relations, userName, u
       preserveScroll: true
     });
   };
+
+  // Grouping definitions by prefix
+  const groups = [
+    {
+      id: 'halaman',
+      title: 'Akses Halaman (halaman_*)',
+      icon: 'fa-file-invoice',
+      color: 'text-indigo-500 bg-indigo-500/10 border-indigo-500/20',
+      borderColor: 'border-l-indigo-500',
+      filter: (perm: Permission) => perm.name.startsWith('halaman_')
+    },
+    {
+      id: 'create',
+      title: 'Tambah Data (create_*)',
+      icon: 'fa-plus',
+      color: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20',
+      borderColor: 'border-l-emerald-500',
+      filter: (perm: Permission) => perm.name.startsWith('create_')
+    },
+    {
+      id: 'update',
+      title: 'Ubah Data (update_*)',
+      icon: 'fa-pen',
+      color: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
+      borderColor: 'border-l-amber-500',
+      filter: (perm: Permission) => perm.name.startsWith('update_')
+    },
+    {
+      id: 'delete',
+      title: 'Hapus Data (delete_*)',
+      icon: 'fa-trash',
+      color: 'text-rose-500 bg-rose-500/10 border-rose-500/20',
+      borderColor: 'border-l-rose-500',
+      filter: (perm: Permission) => perm.name.startsWith('delete_')
+    },
+    {
+      id: 'manage',
+      title: 'Manajemen Sistem (manage_* / view_*)',
+      icon: 'fa-shield-halved',
+      color: 'text-sky-500 bg-sky-500/10 border-sky-500/20',
+      borderColor: 'border-l-sky-500',
+      filter: (perm: Permission) => perm.name.startsWith('manage_') || perm.name.startsWith('view_')
+    },
+    {
+      id: 'other',
+      title: 'Lainnya',
+      icon: 'fa-circle-question',
+      color: 'text-slate-500 bg-slate-500/10 border-slate-500/20',
+      borderColor: 'border-l-slate-400',
+      filter: (perm: Permission) => !perm.name.startsWith('halaman_') && 
+                                    !perm.name.startsWith('create_') && 
+                                    !perm.name.startsWith('update_') && 
+                                    !perm.name.startsWith('delete_') && 
+                                    !perm.name.startsWith('manage_') && 
+                                    !perm.name.startsWith('view_')
+    }
+  ];
 
   return (
     <>
@@ -63,27 +117,57 @@ export default function Matrix({ roles, permissions_list, relations, userName, u
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {permissions_list.map(perm => (
-                <tr key={perm.id} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-colors">
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-700 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800 sticky left-0 bg-white dark:bg-[#0a0a0c] z-10">
-                    {perm.name}
-                  </td>
-                  {roles.map(role => (
-                    <td key={role.id} className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => togglePermission(role.id, perm.id)}
-                        className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mx-auto transition-all ${
-                          hasPermission(role.id, perm.id)
-                            ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-lg shadow-[#e11d48]/20'
-                            : 'bg-transparent border-slate-200 dark:border-slate-700 text-transparent hover:border-[#e11d48]/50'
-                        }`}
+              {groups.map(group => {
+                const groupPerms = permissions_list.filter(group.filter);
+                if (groupPerms.length === 0) return null;
+
+                return (
+                  <React.Fragment key={group.id}>
+                    {/* Category Header Row */}
+                    <tr className="bg-slate-50/60 dark:bg-white/[0.01]">
+                      <td 
+                        colSpan={roles.length + 1} 
+                        className={`px-6 py-2.5 text-[10px] font-bold border-l-4 ${group.borderColor} uppercase tracking-wider sticky left-0 bg-slate-50/90 dark:bg-[#0f172a]/95 backdrop-blur-sm z-10 border-b border-slate-100 dark:border-slate-800`}
                       >
-                        <i className="fas fa-check text-[10px]"></i>
-                      </button>
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center justify-center w-5 h-5 rounded-md border ${group.color}`}>
+                            <i className={`fas ${group.icon} text-[9px]`}></i>
+                          </span>
+                          <span className="text-slate-700 dark:text-slate-300">{group.title}</span>
+                          <span className="text-[9px] font-normal text-slate-400 dark:text-slate-500 lowercase bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 rounded-full border border-slate-200/50 dark:border-white/5">
+                            {groupPerms.length} item
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* Permissions inside Category */}
+                    {groupPerms.map(perm => (
+                      <tr key={perm.id} className="hover:bg-slate-50/50 dark:hover:bg-white/[0.01] transition-colors">
+                        <td className="px-8 py-3.5 border-r border-slate-100 dark:border-slate-800 sticky left-0 bg-white dark:bg-[#0a0a0c] z-10">
+                          <span className="font-mono text-xs bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2 py-1 rounded-md text-slate-600 dark:text-slate-300 shadow-sm">
+                            {perm.name}
+                          </span>
+                        </td>
+                        {roles.map(role => (
+                          <td key={role.id} className="px-6 py-3.5 text-center">
+                            <button
+                              onClick={() => togglePermission(role.id, perm.id)}
+                              className={`w-6 h-6 rounded-md border-2 flex items-center justify-center mx-auto transition-all ${
+                                hasPermission(role.id, perm.id)
+                                  ? 'bg-[#e11d48] border-[#e11d48] text-white shadow-lg shadow-[#e11d48]/20'
+                                  : 'bg-transparent border-slate-200 dark:border-slate-700 text-transparent hover:border-[#e11d48]/50'
+                              }`}
+                            >
+                              <i className="fas fa-check text-[10px]"></i>
+                            </button>
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         </div>
