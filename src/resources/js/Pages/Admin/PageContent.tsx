@@ -28,6 +28,10 @@ interface PageContentProps {
   booking_packages: any[];
   sop_rules: any[];
   contact_infos: any[];
+  booking_requests: any[];
+  join_requests: any[];
+  booking_categories: any[];
+  join_categories: any[];
   userName?: string;
   userEmail?: string;
   permissions: string[];
@@ -136,6 +140,10 @@ export default function PageContent({
   booking_packages,
   sop_rules,
   contact_infos,
+  booking_requests = [],
+  join_requests = [],
+  booking_categories = [],
+  join_categories = [],
   permissions = [],
   settings
 }: PageContentProps) {
@@ -235,6 +243,10 @@ export default function PageContent({
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
 
+  // Detail Modal state for requests
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<Record<string, any> | null>(null);
+
   // Dynamic generic form fields for collections
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [imageFile, setImageFile] = useState<{ base64: string; name: string; mime: string } | null>(null);
@@ -318,6 +330,8 @@ export default function PageContent({
     else if (activeCollection === 'galleries') defaults = { category: 'Latihan', title: '', description: '' };
     else if (activeCollection === 'join_steps') defaults = { step: '', title: '', description: '', category: 'pendaftaran' };
     else if (activeCollection === 'booking_packages') defaults = { name: '', description: '' };
+    else if (activeCollection === 'booking_categories') defaults = { name: '', description: '' };
+    else if (activeCollection === 'join_categories') defaults = { name: '', description: '' };
     else if (activeCollection === 'sop_rules') defaults = { icon: 'fa-exclamation-circle', text: '', category: 'aturan' };
     else if (activeCollection === 'contact_infos') defaults = { icon: 'fa-phone', label: '', value: '' };
     
@@ -450,6 +464,10 @@ export default function PageContent({
       case 'galleries': base = 'galeri'; break;
       case 'join_steps': base = 'join'; break;
       case 'booking_packages': base = 'booking'; break;
+      case 'booking_categories': base = 'booking'; break;
+      case 'booking_requests': base = 'booking'; break;
+      case 'join_categories': base = 'join'; break;
+      case 'join_requests': base = 'join'; break;
       case 'sop_rules': base = 'sop'; break;
       case 'contact_infos': base = 'kontak'; break;
       default: base = collection; break;
@@ -461,9 +479,10 @@ export default function PageContent({
     };
   };
 
+  const isRequestCollection = activeCollection === 'booking_requests' || activeCollection === 'join_requests';
   const { create: createPerm, update: updatePerm, delete: deletePerm } = getCRUDPermissions(activeCollection);
-  const canCreate = hasPermission(createPerm);
-  const canUpdate = hasPermission(updatePerm);
+  const canCreate = !isRequestCollection && hasPermission(createPerm);
+  const canUpdate = !isRequestCollection && hasPermission(updatePerm);
   const canDelete = hasPermission(deletePerm);
 
   // Fetch items list for active collection tab
@@ -478,6 +497,10 @@ export default function PageContent({
       case 'galleries': return galleries;
       case 'join_steps': return join_steps;
       case 'booking_packages': return booking_packages;
+      case 'booking_requests': return booking_requests;
+      case 'join_requests': return join_requests;
+      case 'booking_categories': return booking_categories;
+      case 'join_categories': return join_categories;
       case 'sop_rules': return sop_rules;
       case 'contact_infos': return contact_infos;
       default: return [];
@@ -668,7 +691,11 @@ export default function PageContent({
                 { key: 'philosophical_values', label: '💡 Nilai Filosofi', perm: 'halaman_filosofi' },
                 { key: 'galleries', label: '🖼️ Galeri Foto', perm: 'halaman_galeri' },
                 { key: 'join_steps', label: '👣 Syarat & Gabung', perm: 'halaman_join' },
+                { key: 'join_categories', label: ' Kategori Sasian', perm: 'halaman_join' },
+                { key: 'join_requests', label: '📬 Pendaftaran Join', perm: 'halaman_join' },
                 { key: 'booking_packages', label: '📦 Paket Reservasi', perm: 'halaman_booking' },
+                { key: 'booking_categories', label: '📦 Kategori Booking', perm: 'halaman_booking' },
+                { key: 'booking_requests', label: '📬 Permintaan Booking', perm: 'halaman_booking' },
                 { key: 'sop_rules', label: '📜 Aturan SOP', perm: 'halaman_sop' },
                 { key: 'contact_infos', label: '📞 Informasi Kontak', perm: 'halaman_kontak' }
               ].map((col) => {
@@ -769,9 +796,41 @@ export default function PageContent({
                           <th className="py-3 px-4">Deskripsi</th>
                         </>
                       )}
-                      {activeCollection === 'booking_packages' && (
+                       {activeCollection === 'booking_packages' && (
                         <>
                           <th className="py-3 px-4">Nama Paket</th>
+                        </>
+                      )}
+                      {activeCollection === 'booking_categories' && (
+                        <>
+                          <th className="py-3 px-4">Nama Kategori</th>
+                          <th className="py-3 px-4">Deskripsi</th>
+                        </>
+                      )}
+                      {activeCollection === 'booking_requests' && (
+                        <>
+                          <th className="py-3 px-4">Penyelenggara</th>
+                          <th className="py-3 px-4">Email</th>
+                          <th className="py-3 px-4">WhatsApp</th>
+                          <th className="py-3 px-4">Tgl Acara</th>
+                          <th className="py-3 px-4">Tgl Kirim</th>
+                          <th className="py-3 px-4">Pementasan</th>
+                        </>
+                      )}
+                      {activeCollection === 'join_categories' && (
+                        <>
+                          <th className="py-3 px-4">Nama Kelas</th>
+                          <th className="py-3 px-4">Deskripsi</th>
+                        </>
+                      )}
+                      {activeCollection === 'join_requests' && (
+                        <>
+                          <th className="py-3 px-4">Nama Sasian</th>
+                          <th className="py-3 px-4">Email</th>
+                          <th className="py-3 px-4">Asal</th>
+                          <th className="py-3 px-4">WhatsApp</th>
+                          <th className="py-3 px-4">Tgl Daftar</th>
+                          <th className="py-3 px-4">Kelas Pilihan</th>
                         </>
                       )}
                       {activeCollection === 'sop_rules' && (
@@ -883,10 +942,58 @@ export default function PageContent({
                             </>
                           )}
 
-                          {/* Booking Packages list cells */}
+                           {/* Booking Packages list cells */}
                           {activeCollection === 'booking_packages' && (
                             <>
                               <td className="py-3 px-4 font-bold">{item.name}</td>
+                            </>
+                          )}
+
+                          {/* Booking Categories list cells */}
+                          {activeCollection === 'booking_categories' && (
+                            <>
+                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4 text-slate-500">{item.description || '-'}</td>
+                            </>
+                          )}
+
+                          {/* Booking Requests list cells */}
+                          {activeCollection === 'booking_requests' && (
+                            <>
+                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4">{item.email}</td>
+                              <td className="py-3 px-4 font-mono text-[10px]">{item.whatsapp}</td>
+                              <td className="py-3 px-4 font-mono text-[10px]">{item.date}</td>
+                              <td className="py-3 px-4 font-mono text-[10px]">{item.created_at || '-'}</td>
+                              <td className="py-3 px-4">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/25">
+                                  {item.show_type}
+                                </span>
+                              </td>
+                            </>
+                          )}
+
+                          {/* Join Categories list cells */}
+                          {activeCollection === 'join_categories' && (
+                            <>
+                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4 text-slate-500">{item.description || '-'}</td>
+                            </>
+                          )}
+
+                          {/* Join Requests list cells */}
+                          {activeCollection === 'join_requests' && (
+                            <>
+                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4">{item.email || '-'}</td>
+                              <td className="py-3 px-4">{item.origin}</td>
+                              <td className="py-3 px-4 font-mono text-[10px]">{item.whatsapp}</td>
+                              <td className="py-3 px-4 font-mono text-[10px]">{item.created_at || '-'}</td>
+                              <td className="py-3 px-4">
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/25">
+                                  {item.class_category}
+                                </span>
+                              </td>
                             </>
                           )}
 
@@ -907,6 +1014,17 @@ export default function PageContent({
                           )}
 
                           <td className="py-3 px-4 text-right space-x-2 shrink-0">
+                            {(activeCollection === 'booking_requests' || activeCollection === 'join_requests') && (
+                              <button
+                                onClick={() => {
+                                  setSelectedRequest(item);
+                                  setShowDetailModal(true);
+                                }}
+                                className="px-2.5 py-1.5 bg-[#e11d48]/10 text-[#e11d48] hover:bg-[#e11d48]/20 rounded-lg text-[10px] font-bold"
+                              >
+                                Detail
+                              </button>
+                            )}
                             {canUpdate && (
                               <button
                                 onClick={() => openEditModal(item)}
@@ -1417,6 +1535,32 @@ export default function PageContent({
                 </div>
               )}
 
+              {(activeCollection === 'booking_categories' || activeCollection === 'join_categories') && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nama Kategori / Kelas</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.name || ''}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs dark:text-white"
+                      placeholder="Cth: Tari Piring Tradisional"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Deskripsi Singkat</label>
+                    <textarea
+                      value={formData.description || ''}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2 text-xs dark:text-white"
+                      placeholder="Jelaskan detail kategori..."
+                    />
+                  </div>
+                </div>
+              )}
+
               {activeCollection === 'sop_rules' && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -1514,6 +1658,106 @@ export default function PageContent({
               </div>
 
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Request Modal */}
+      {showDetailModal && selectedRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl p-8 space-y-6 animate-scale-up">
+            <div className="border-b border-slate-100 dark:border-slate-800/60 pb-4 flex justify-between items-center">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-slate-800 dark:text-white">
+                  Detail {activeCollection === 'booking_requests' ? 'Permintaan Booking' : 'Pendaftaran Anggota (Join)'}
+                </h3>
+                <p className="text-[10px] text-slate-400">ID Permintaan: #{selectedRequest.id}</p>
+              </div>
+              <button 
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setSelectedRequest(null);
+                }}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-lg"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-slate-650 dark:text-slate-350">
+              <div className="space-y-3">
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-400 uppercase">Nama / Instansi</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-white">{selectedRequest.name}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-400 uppercase">Email</span>
+                  <span className="font-mono text-slate-850 dark:text-slate-200">{selectedRequest.email || '-'}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-400 uppercase">WhatsApp</span>
+                  <span className="font-mono text-slate-850 dark:text-slate-200">{selectedRequest.whatsapp}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {activeCollection === 'booking_requests' ? (
+                  <>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase">Tanggal Acara</span>
+                      <span className="font-mono text-slate-850 dark:text-slate-200">{selectedRequest.date}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase">Kategori Pementasan</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/25">
+                        {selectedRequest.show_type}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase">Asal Daerah (Kecamatan/Nagari)</span>
+                      <span className="text-slate-850 dark:text-slate-200">{selectedRequest.origin}</span>
+                    </div>
+                    <div>
+                      <span className="block text-[10px] font-bold text-slate-400 uppercase">Kategori Kelas</span>
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/25">
+                        {selectedRequest.class_category}
+                      </span>
+                    </div>
+                  </>
+                )}
+                <div>
+                  <span className="block text-[10px] font-bold text-slate-400 uppercase">Tanggal Dikirim</span>
+                  <span className="font-mono text-slate-500">{selectedRequest.created_at || '-'}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
+              <span className="block text-[10px] font-bold text-slate-400 uppercase mb-2">
+                {activeCollection === 'booking_requests' ? 'Detail Acara & Catatan' : 'Motivasi Bergabung'}
+              </span>
+              <p className="text-xs text-slate-600 dark:text-white/70 whitespace-pre-wrap leading-relaxed font-light">
+                {activeCollection === 'booking_requests' 
+                  ? (selectedRequest.details || 'Tidak ada catatan tambahan.') 
+                  : (selectedRequest.motivation || 'Tidak ada motivasi ditulis.')}
+              </p>
+            </div>
+
+            <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDetailModal(false);
+                  setSelectedRequest(null);
+                }}
+                className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-slate-200 dark:hover:bg-slate-750 transition-all"
+              >
+                Tutup Detail
+              </button>
+            </div>
           </div>
         </div>
       )}

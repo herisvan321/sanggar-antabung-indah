@@ -37,6 +37,7 @@ pub fn router() -> Router<AppState> {
     let page_routes = Router::new()
         .route("/dashboard/pages", get(admin::page_content_controller::PageContentController::index))
         .route("/dashboard/pages", post(admin::page_content_controller::PageContentController::update))
+        .route("/dashboard/pages/active-pages", post(admin::page_content_controller::PageContentController::update_active_pages))
         .layer(from_fn(|req, next| permission_middleware(req, next, "halaman_pages")));
 
     let article_routes = Router::new()
@@ -94,6 +95,22 @@ pub fn router() -> Router<AppState> {
         .merge(Router::new().route("/dashboard/contact_infos/:id", post(admin::page_content_controller::PageContentController::update_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "update_kontak"))))
         .merge(Router::new().route("/dashboard/contact_infos/:id/delete", post(admin::page_content_controller::PageContentController::delete_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_kontak"))));
 
+    let booking_request_routes = Router::new()
+        .merge(Router::new().route("/dashboard/booking_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_booking"))));
+
+    let join_request_routes = Router::new()
+        .merge(Router::new().route("/dashboard/join_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_join"))));
+
+    let booking_category_routes = Router::new()
+        .merge(Router::new().route("/dashboard/booking_categories", post(admin::page_content_controller::PageContentController::store_booking_category)).layer(from_fn(|req, next| permission_middleware(req, next, "create_booking"))))
+        .merge(Router::new().route("/dashboard/booking_categories/:id", post(admin::page_content_controller::PageContentController::update_booking_category)).layer(from_fn(|req, next| permission_middleware(req, next, "update_booking"))))
+        .merge(Router::new().route("/dashboard/booking_categories/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_category)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_booking"))));
+
+    let join_category_routes = Router::new()
+        .merge(Router::new().route("/dashboard/join_categories", post(admin::page_content_controller::PageContentController::store_join_category)).layer(from_fn(|req, next| permission_middleware(req, next, "create_join"))))
+        .merge(Router::new().route("/dashboard/join_categories/:id", post(admin::page_content_controller::PageContentController::update_join_category)).layer(from_fn(|req, next| permission_middleware(req, next, "update_join"))))
+        .merge(Router::new().route("/dashboard/join_categories/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_category)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_join"))));
+
     let dashboard_route = Router::new()
         .route("/dashboard", get(dashboard_controller::DashboardController::index))
         .layer(from_fn(|req, next| permission_middleware(req, next, "view_dashboard")));
@@ -121,6 +138,10 @@ pub fn router() -> Router<AppState> {
         .merge(booking_package_routes)
         .merge(sop_rule_routes)
         .merge(contact_info_routes)
+        .merge(booking_request_routes)
+        .merge(join_request_routes)
+        .merge(booking_category_routes)
+        .merge(join_category_routes)
         .merge(other_protected_routes)
         .layer(from_fn(auth_middleware));
 
@@ -135,9 +156,11 @@ pub fn router() -> Router<AppState> {
         .route("/jadwal", get(welcome_controller::other_jadwal))
         .route("/program", get(welcome_controller::other_program))
         .route("/join", get(welcome_controller::other_join))
+        .route("/join/request", post(welcome_controller::submit_join_request))
         .route("/berita", get(welcome_controller::other_berita))
         .route("/berita/:slug", get(welcome_controller::other_berita_detail))
         .route("/booking", get(welcome_controller::other_booking))
+        .route("/booking/request", post(welcome_controller::submit_booking_request))
         .route("/kontak", get(welcome_controller::other_kontak))
         .route("/sop", get(welcome_controller::other_sop))
         .merge(auth_routes::router())

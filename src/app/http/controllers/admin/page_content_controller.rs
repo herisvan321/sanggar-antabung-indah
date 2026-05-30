@@ -16,6 +16,10 @@ use crate::app::services::booking_package_service::BookingPackageService;
 use crate::app::services::sop_rule_service::SopRuleService;
 use crate::app::services::contact_info_service::ContactInfoService;
 use crate::app::services::setting_service::SettingService;
+use crate::app::services::booking_request_service::BookingRequestService;
+use crate::app::services::join_request_service::JoinRequestService;
+use crate::app::services::booking_category_service::BookingCategoryService;
+use crate::app::services::join_category_service::JoinCategoryService;
 
 use crate::app::models::users;
 use crate::app::http::controllers::admin::helper::get_user_permissions;
@@ -349,6 +353,10 @@ impl PageContentController {
         let booking_packages = BookingPackageService::new(state.db.clone()).get_all_packages().await.unwrap_or_default();
         let sop_rules = SopRuleService::new(state.db.clone()).get_all_rules().await.unwrap_or_default();
         let contact_infos = ContactInfoService::new(state.db.clone()).get_all_infos().await.unwrap_or_default();
+        let booking_requests = BookingRequestService::new(state.db.clone()).get_all_requests().await.unwrap_or_default();
+        let join_requests = JoinRequestService::new(state.db.clone()).get_all_requests().await.unwrap_or_default();
+        let booking_categories = BookingCategoryService::new(state.db.clone()).get_all_categories().await.unwrap_or_default();
+        let join_categories = JoinCategoryService::new(state.db.clone()).get_all_categories().await.unwrap_or_default();
 
         inertia(&req, "Admin/PageContent", json!({
             "sections": sections,
@@ -363,6 +371,10 @@ impl PageContentController {
             "booking_packages": booking_packages,
             "sop_rules": sop_rules,
             "contact_infos": contact_infos,
+            "booking_requests": booking_requests,
+            "join_requests": join_requests,
+            "booking_categories": booking_categories,
+            "join_categories": join_categories,
             "userName": user.as_ref().map(|u| u.name.clone()).unwrap_or("Guest".to_string()),
             "userEmail": user.as_ref().map(|u| u.email.clone()).unwrap_or_default(),
             "permissions": permissions,
@@ -906,5 +918,117 @@ impl PageContentController {
             Err(e) => { req.session.set("error", format!("Gagal menghapus kontak: {}", e)); }
         }
         Redirect::to("/dashboard/pages").into_response()
+    }
+
+    // Booking Category CRUD
+    pub async fn store_booking_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let data = match req.validate::<CategoryRequest>() {
+            Ok(d) => d,
+            Err(_) => return Redirect::to("/dashboard/pages").into_response(),
+        };
+        let service = BookingCategoryService::new(state.db.clone());
+        match service.create_category(data.name, data.description).await {
+            Ok(_) => { req.session.set("success", "Kategori Booking berhasil ditambahkan"); }
+            Err(e) => { req.session.set("error", format!("Gagal menambahkan kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    pub async fn update_booking_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let data = match req.validate::<CategoryRequest>() {
+            Ok(d) => d,
+            Err(_) => return Redirect::to("/dashboard/pages").into_response(),
+        };
+        let service = BookingCategoryService::new(state.db.clone());
+        match service.update_category(id, data.name, data.description).await {
+            Ok(_) => { req.session.set("success", "Kategori Booking berhasil diperbarui"); }
+            Err(e) => { req.session.set("error", format!("Gagal memperbarui kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    pub async fn delete_booking_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let service = BookingCategoryService::new(state.db.clone());
+        match service.delete_category(id).await {
+            Ok(_) => { req.session.set("success", "Kategori Booking berhasil dihapus"); }
+            Err(e) => { req.session.set("error", format!("Gagal menghapus kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    // Join Category CRUD
+    pub async fn store_join_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let data = match req.validate::<CategoryRequest>() {
+            Ok(d) => d,
+            Err(_) => return Redirect::to("/dashboard/pages").into_response(),
+        };
+        let service = JoinCategoryService::new(state.db.clone());
+        match service.create_category(data.name, data.description).await {
+            Ok(_) => { req.session.set("success", "Kategori Kelas Sasian berhasil ditambahkan"); }
+            Err(e) => { req.session.set("error", format!("Gagal menambahkan kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    pub async fn update_join_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let data = match req.validate::<CategoryRequest>() {
+            Ok(d) => d,
+            Err(_) => return Redirect::to("/dashboard/pages").into_response(),
+        };
+        let service = JoinCategoryService::new(state.db.clone());
+        match service.update_category(id, data.name, data.description).await {
+            Ok(_) => { req.session.set("success", "Kategori Kelas Sasian berhasil diperbarui"); }
+            Err(e) => { req.session.set("error", format!("Gagal memperbarui kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    pub async fn delete_join_category(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let service = JoinCategoryService::new(state.db.clone());
+        match service.delete_category(id).await {
+            Ok(_) => { req.session.set("success", "Kategori Kelas Sasian berhasil dihapus"); }
+            Err(e) => { req.session.set("error", format!("Gagal menghapus kategori: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    // Booking Request delete
+    pub async fn delete_booking_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let service = BookingRequestService::new(state.db.clone());
+        match service.delete_request(id).await {
+            Ok(_) => { req.session.set("success", "Permintaan Booking berhasil dihapus"); }
+            Err(e) => { req.session.set("error", format!("Gagal menghapus permintaan: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    // Join Request delete
+    pub async fn delete_join_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let service = JoinRequestService::new(state.db.clone());
+        match service.delete_request(id).await {
+            Ok(_) => { req.session.set("success", "Pendaftaran Join berhasil dihapus"); }
+            Err(e) => { req.session.set("error", format!("Gagal menghapus pendaftaran: {}", e)); }
+        }
+        Redirect::to("/dashboard/pages").into_response()
+    }
+}
+
+#[derive(Deserialize)]
+pub struct CategoryRequest {
+    pub name: String,
+    pub description: Option<String>,
+}
+
+impl Validate for CategoryRequest {
+    fn validate(&self) -> Result<(), HashMap<String, String>> {
+        let mut errs = HashMap::new();
+        if self.name.trim().is_empty() { errs.insert("name".to_string(), "Nama kategori tidak boleh kosong".to_string()); }
+        if errs.is_empty() { Ok(()) } else { Err(errs) }
     }
 }

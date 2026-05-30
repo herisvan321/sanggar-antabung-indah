@@ -844,6 +844,93 @@ seeder! {
             println!("   {} Normalized 'contact_infos' seeded", "✅".green());
         }
 
+        // 7.12 Booking Categories
+        if DB::table(db, "booking_categories").count().await.unwrap_or(0) == 0 {
+            let items = vec![
+                "Penyambutan Tamu / Pasambahan",
+                "Pernikahan Kultural Adat",
+                "Pertunjukan Randai Kolosal",
+            ];
+            for name in items {
+                let _ = DB::table(db, "booking_categories").insert(serde_json::json!({
+                    "name": name,
+                    "description": format!("Kategori pementasan: {}", name),
+                    "created_at": now.clone(),
+                    "updated_at": now.clone(),
+                })).await;
+            }
+            println!("   {} Normalized 'booking_categories' seeded", "✅".green());
+        }
+
+        // 7.13 Join Categories
+        if DB::table(db, "join_categories").count().await.unwrap_or(0) == 0 {
+            let items = vec![
+                "Pemain Randai / Aktor",
+                "Silek Tradisional Minang",
+                "Pemusik (Talempong/Rabab)",
+                "Tari Pijak Galeh (Piring)",
+            ];
+            for name in items {
+                let _ = DB::table(db, "join_categories").insert(serde_json::json!({
+                    "name": name,
+                    "description": format!("Kategori kelas latihan: {}", name),
+                    "created_at": now.clone(),
+                    "updated_at": now.clone(),
+                })).await;
+            }
+            println!("   {} Normalized 'join_categories' seeded", "✅".green());
+        }
+
+        // 7.14 Booking Requests (Dummy data)
+        if DB::table(db, "booking_requests").count().await.unwrap_or(0) == 0 {
+            let _ = DB::table(db, "booking_requests").insert(serde_json::json!({
+                "name": "Dinas Kebudayaan Sijunjung",
+                "email": "budaya@sijunjung.go.id",
+                "whatsapp": "081234567890",
+                "date": "2026-06-15",
+                "show_type": "Penyambutan Tamu / Pasambahan",
+                "details": "Pementasan tari pasambahan untuk menyambut kunjungan studi banding kementerian di kantor bupati.",
+                "created_at": now.clone(),
+                "updated_at": now.clone(),
+            })).await;
+            let _ = DB::table(db, "booking_requests").insert(serde_json::json!({
+                "name": "Panitia Festival Kesenian Nagari",
+                "email": "fest.nagari@sisawah.org",
+                "whatsapp": "082345678901",
+                "date": "2026-07-20",
+                "show_type": "Pertunjukan Randai Kolosal",
+                "details": "Pertunjukan randai lakon Anggun Nan Tongga di panggung utama festival rakyat jorong tarok.",
+                "created_at": now.clone(),
+                "updated_at": now.clone(),
+            })).await;
+            println!("   {} Normalized 'booking_requests' seeded", "✅".green());
+        }
+
+        // 7.15 Join Requests (Dummy data)
+        if DB::table(db, "join_requests").count().await.unwrap_or(0) == 0 {
+            let _ = DB::table(db, "join_requests").insert(serde_json::json!({
+                "name": "Andi Saputra",
+                "email": "andi.s@mail.com",
+                "origin": "Sisawah, Jorong Tarok",
+                "whatsapp": "085299887766",
+                "class_category": "Silek Tradisional Minang",
+                "motivation": "Ingin melestarikan silek tradisional peninggalan nenek moyang dan membela diri.",
+                "created_at": now.clone(),
+                "updated_at": now.clone(),
+            })).await;
+            let _ = DB::table(db, "join_requests").insert(serde_json::json!({
+                "name": "Siti Rahma",
+                "email": "siti.rahma@mail.com",
+                "origin": "Koto VII, Sijunjung",
+                "whatsapp": "081299881122",
+                "class_category": "Tari Pijak Galeh (Piring)",
+                "motivation": "Sangat tertarik mempelajari kelincahan menari di atas pecahan kaca sejak kecil.",
+                "created_at": now.clone(),
+                "updated_at": now.clone(),
+            })).await;
+            println!("   {} Normalized 'join_requests' seeded", "✅".green());
+        }
+
         Ok(())
     }
 }

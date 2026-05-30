@@ -31,6 +31,7 @@ impl JoinRequestService {
     pub async fn create_request(
         &self,
         name: String,
+        email: String,
         origin: String,
         whatsapp: String,
         class_category: String,
@@ -39,6 +40,7 @@ impl JoinRequestService {
         let now = rustbasic_core::chrono::Local::now().naive_local().format("%Y-%m-%d %H:%M:%S").to_string();
         let data = json!({
             "name": name,
+            "email": email,
             "origin": origin,
             "whatsapp": whatsapp,
             "class_category": class_category,

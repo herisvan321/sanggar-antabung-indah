@@ -29,6 +29,7 @@ impl MigrationTrait for Migration {
             table.id();
             table.no_timestamps();
             table.string("name").not_null();
+            table.string("email").not_null();
             table.string("origin").not_null();
             table.string("whatsapp").not_null();
             table.string("class_category").not_null();

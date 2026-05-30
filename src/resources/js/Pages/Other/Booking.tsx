@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
 import { useOtherTheme } from '../../Layouts/OtherThemeContext';
 
@@ -20,9 +20,15 @@ interface BookingPackageItem {
   description: string;
 }
 
+interface BookingCategoryItem {
+  id: number;
+  name: string;
+}
+
 interface BookingProps {
   sections?: PageSection[];
   booking_packages?: BookingPackageItem[];
+  booking_categories?: BookingCategoryItem[];
 }
 
 const defaultPackages: BookingPackageItem[] = [
@@ -30,8 +36,25 @@ const defaultPackages: BookingPackageItem[] = [
   { id: 2, name: "Paket Musik Talempong", description: "Tabuhan instrumen Talempong Ungah penyambutan tamu resmi." }
 ];
 
-export default function Booking({ sections, booking_packages }: BookingProps) {
+export default function Booking({ sections, booking_packages, booking_categories }: BookingProps) {
   const { showToast } = useOtherTheme();
+
+  // Form State
+  const { data, setData, post, processing, errors, reset } = useForm({
+    name: '',
+    email: '',
+    whatsapp: '',
+    date: '',
+    show_type: '',
+    details: ''
+  });
+
+  // Set default show_type when categories load
+  useEffect(() => {
+    if (booking_categories && booking_categories.length > 0 && !data.show_type) {
+      setData('show_type', booking_categories[0].name);
+    }
+  }, [booking_categories]);
 
   // Calculator State
   const [calcScale, setCalcScale] = useState(3);
@@ -56,8 +79,15 @@ export default function Booking({ sections, booking_packages }: BookingProps) {
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
-    showToast('Permintaan Terkirim! Proposal & estimasi biaya pementasan dikirim ke WhatsApp Anda.');
-    (e.target as HTMLFormElement).reset();
+    post('/booking/request', {
+      onSuccess: () => {
+        showToast('Permintaan Sewa Pementasan Berhasil Terkirim!');
+        reset();
+      },
+      onError: () => {
+        showToast('Gagal mengirim pementasan. Harap cek kembali isian Anda.');
+      }
+    });
   };
 
   // Parse Sections
@@ -179,41 +209,98 @@ export default function Booking({ sections, booking_packages }: BookingProps) {
             <form onSubmit={handleFormSubmit} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nama Instansi / Penyelenggara</label>
-                <input type="text" required placeholder="Contoh: Panitia Festival Sijunjung" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" />
+                <input 
+                  type="text" 
+                  required 
+                  value={data.name}
+                  onChange={(e) => setData('name', e.target.value)}
+                  placeholder="Contoh: Panitia Festival Sijunjung" 
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" 
+                />
+                {errors.name && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.name}</p>}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Email Kontak Utama</label>
-                  <input type="email" required placeholder="kontak@instansi.com" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" />
+                  <input 
+                    type="email" 
+                    required 
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    placeholder="kontak@instansi.com" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" 
+                  />
+                  {errors.email && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.email}</p>}
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nomor WhatsApp</label>
-                  <input type="tel" required placeholder="08XXXXXXXXXX" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" />
+                  <input 
+                    type="tel" 
+                    required 
+                    value={data.whatsapp}
+                    onChange={(e) => setData('whatsapp', e.target.value)}
+                    placeholder="08XXXXXXXXXX" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" 
+                  />
+                  {errors.whatsapp && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.whatsapp}</p>}
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Rencana Tanggal Acara</label>
-                  <input type="date" required className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" />
+                  <input 
+                    type="date" 
+                    required 
+                    value={data.date}
+                    onChange={(e) => setData('date', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300" 
+                  />
+                  {errors.date && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.date}</p>}
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Tipe Pementasan</label>
-                  <select className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300">
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Penyambutan Tamu / Pasambahan</option>
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pernikahan Kultural Adat</option>
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pertunjukan Randai Kolosal</option>
+                  <select 
+                    value={data.show_type}
+                    onChange={(e) => setData('show_type', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300"
+                  >
+                    {booking_categories && booking_categories.length > 0 ? (
+                      booking_categories.map((cat) => (
+                        <option key={cat.id} value={cat.name} className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">
+                          {cat.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Penyambutan Tamu / Pasambahan" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Penyambutan Tamu / Pasambahan</option>
+                        <option value="Pernikahan Kultural Adat" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pernikahan Kultural Adat</option>
+                        <option value="Pertunjukan Randai Kolosal" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pertunjukan Randai Kolosal</option>
+                      </>
+                    )}
                   </select>
+                  {errors.show_type && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.show_type}</p>}
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Detail Kebutuhan Acara</label>
-                <textarea rows={3} placeholder="Sebutkan lokasi spesifik pementasan di Sijunjung..." className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300"></textarea>
+                <textarea 
+                  rows={3} 
+                  value={data.details}
+                  onChange={(e) => setData('details', e.target.value)}
+                  placeholder="Sebutkan lokasi spesifik pementasan di Sijunjung..." 
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#fbbf24] text-sm transition-colors duration-300"
+                />
+                {errors.details && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.details}</p>}
               </div>
 
-              <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#fbbf24] to-[#10b981] text-black text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#fbbf24]/20">
-                Ajukan Sewa Pementasan
+              <button 
+                type="submit" 
+                disabled={processing}
+                className="w-full py-4 bg-gradient-to-r from-[#fbbf24] to-[#10b981] text-black text-sm font-bold rounded-xl hover:brightness-110 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#fbbf24]/20 disabled:opacity-50"
+              >
+                {processing ? 'Mengirim...' : 'Ajukan Sewa Pementasan'}
               </button>
             </form>
           </div>

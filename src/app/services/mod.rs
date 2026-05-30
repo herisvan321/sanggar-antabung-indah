@@ -17,3 +17,7 @@ pub mod join_step_service;
 pub mod booking_package_service;
 pub mod sop_rule_service;
 pub mod contact_info_service;
+pub mod booking_request_service;
+pub mod join_request_service;
+pub mod booking_category_service;
+pub mod join_category_service;

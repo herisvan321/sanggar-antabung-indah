@@ -1,5 +1,5 @@
-import { FormEvent } from 'react';
-import { Head } from '@inertiajs/react';
+import { useEffect, FormEvent } from 'react';
+import { Head, useForm } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
 import { useOtherTheme } from '../../Layouts/OtherThemeContext';
 
@@ -22,9 +22,15 @@ interface JoinStepItem {
   category: string;
 }
 
+interface JoinCategoryItem {
+  id: number;
+  name: string;
+}
+
 interface JoinProps {
   sections?: PageSection[];
   join_steps?: JoinStepItem[];
+  join_categories?: JoinCategoryItem[];
 }
 
 const defaultSyarat: JoinStepItem[] = [
@@ -39,8 +45,25 @@ const defaultPendaftaran: JoinStepItem[] = [
   { id: 6, step: "3", title: "Pengukuhan Sasian", description: "Prosesi adat pengukuhan murid baru gelanggang (sasasian).", category: "pendaftaran" }
 ];
 
-export default function Join({ sections, join_steps }: JoinProps) {
+export default function Join({ sections, join_steps, join_categories }: JoinProps) {
   const { showToast } = useOtherTheme();
+
+  // Form State
+  const { data, setData, post, processing, errors, reset } = useForm({
+    name: '',
+    email: '',
+    origin: '',
+    whatsapp: '',
+    class_category: '',
+    motivation: ''
+  });
+
+  // Set default class_category when categories load
+  useEffect(() => {
+    if (join_categories && join_categories.length > 0 && !data.class_category) {
+      setData('class_category', join_categories[0].name);
+    }
+  }, [join_categories]);
 
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
@@ -48,8 +71,15 @@ export default function Join({ sections, join_steps }: JoinProps) {
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
-    showToast('Pendaftaran Berhasil! Pengurus Sanggar akan menghubungi Anda via WhatsApp.');
-    (e.target as HTMLFormElement).reset();
+    post('/join/request', {
+      onSuccess: () => {
+        showToast('Pendaftaran Berhasil Dikirim!');
+        reset();
+      },
+      onError: () => {
+        showToast('Gagal memproses pendaftaran. Harap cek kembali isian Anda.');
+      }
+    });
   };
 
   // Parse Sections
@@ -112,37 +142,102 @@ export default function Join({ sections, join_steps }: JoinProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nama Lengkap</label>
-                  <input type="text" required placeholder="Contoh: Rajo Diwangso" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                  <input 
+                    type="text" 
+                    required 
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    placeholder="Contoh: Rajo Diwangso" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" 
+                  />
+                  {errors.name && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.name}</p>}
                 </div>
                 <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Email</label>
+                  <input 
+                    type="email" 
+                    required 
+                    value={data.email}
+                    onChange={(e) => setData('email', e.target.value)}
+                    placeholder="nama@email.com" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" 
+                  />
+                  {errors.email && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.email}</p>}
+                </div>
+              </div>
+
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Asal Daerah (Kecamatan/Nagari)</label>
-                  <input type="text" required placeholder="Contoh: Sisawah, Sumpur Kudus" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                  <input 
+                    type="text" 
+                    required 
+                    value={data.origin}
+                    onChange={(e) => setData('origin', e.target.value)}
+                    placeholder="Contoh: Sisawah, Sumpur Kudus" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" 
+                  />
+                  {errors.origin && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.origin}</p>}
                 </div>
               </div>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nomor WhatsApp</label>
-                  <input type="tel" required placeholder="0812XXXXXXXX" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                  <input 
+                    type="tel" 
+                    required 
+                    value={data.whatsapp}
+                    onChange={(e) => setData('whatsapp', e.target.value)}
+                    placeholder="0812XXXXXXXX" 
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" 
+                  />
+                  {errors.whatsapp && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.whatsapp}</p>}
                 </div>
                 <div className="space-y-1">
                   <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Kategori Kelas Utama</label>
-                  <select className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300">
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemain Randai / Aktor</option>
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Silek Tradisional Minang</option>
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemusik (Talempong/Rabab)</option>
-                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Tari Pijak Galeh (Piring)</option>
+                  <select 
+                    value={data.class_category}
+                    onChange={(e) => setData('class_category', e.target.value)}
+                    className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300"
+                  >
+                    {join_categories && join_categories.length > 0 ? (
+                      join_categories.map((cat) => (
+                        <option key={cat.id} value={cat.name} className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">
+                          {cat.name}
+                        </option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Pemain Randai / Aktor" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemain Randai / Aktor</option>
+                        <option value="Silek Tradisional Minang" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Silek Tradisional Minang</option>
+                        <option value="Pemusik (Talempong/Rabab)" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemusik (Talempong/Rabab)</option>
+                        <option value="Tari Pijak Galeh (Piring)" className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Tari Pijak Galeh (Piring)</option>
+                      </>
+                    )}
                   </select>
+                  {errors.class_category && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.class_category}</p>}
                 </div>
               </div>
 
               <div className="space-y-1">
                 <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Motivasi Bergabung</label>
-                <textarea rows={3} placeholder="Ceritakan ketertarikan Anda bersama kami..." className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300"></textarea>
+                <textarea 
+                  rows={3} 
+                  value={data.motivation}
+                  onChange={(e) => setData('motivation', e.target.value)}
+                  placeholder="Ceritakan ketertarikan Anda bersama kami..." 
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300"
+                />
+                {errors.motivation && <p className="text-red-500 text-[10px] font-bold mt-1">{errors.motivation}</p>}
               </div>
 
-              <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#e11d48] to-[#fbbf24] text-white text-sm font-bold rounded-xl hover:brightness-115 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#e11d48]/20">
-                Kirim Berkas Pendaftaran
+              <button 
+                type="submit" 
+                disabled={processing}
+                className="w-full py-4 bg-gradient-to-r from-[#e11d48] to-[#fbbf24] text-white text-sm font-bold rounded-xl hover:brightness-115 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#e11d48]/20 disabled:opacity-50"
+              >
+                {processing ? 'Mengirim...' : 'Kirim Berkas Pendaftaran'}
               </button>
             </form>
           </div>

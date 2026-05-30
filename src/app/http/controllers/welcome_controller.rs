@@ -11,6 +11,13 @@ use crate::app::services::join_step_service::JoinStepService;
 use crate::app::services::booking_package_service::BookingPackageService;
 use crate::app::services::sop_rule_service::SopRuleService;
 use crate::app::services::contact_info_service::ContactInfoService;
+use crate::app::services::booking_category_service::BookingCategoryService;
+use crate::app::services::join_category_service::JoinCategoryService;
+use crate::app::services::booking_request_service::BookingRequestService;
+use crate::app::services::join_request_service::JoinRequestService;
+use rustbasic_core::serde::Deserialize;
+use rustbasic_core::validator::Validate;
+use std::collections::HashMap;
 
 use rustbasic_core::requests::Request;
 use rustbasic_core::responses::ResponseHelper;
@@ -163,10 +170,12 @@ pub async fn other_join(State(state): State<AppState>, req: Request) -> impl Int
     }
     let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("join").await.unwrap_or_default();
     let steps = JoinStepService::new(state.db.clone()).get_all_steps().await.unwrap_or_default();
+    let categories = JoinCategoryService::new(state.db.clone()).get_all_categories().await.unwrap_or_default();
     
     render_guest(&req, "Other/Join", json!({
         "sections": sections,
-        "join_steps": steps
+        "join_steps": steps,
+        "join_categories": categories
     })).into_response()
 }
 
@@ -206,10 +215,12 @@ pub async fn other_booking(State(state): State<AppState>, req: Request) -> impl 
     }
     let sections = PageSectionService::new(state.db.clone()).get_sections_by_page("booking").await.unwrap_or_default();
     let packages = BookingPackageService::new(state.db.clone()).get_all_packages().await.unwrap_or_default();
+    let categories = BookingCategoryService::new(state.db.clone()).get_all_categories().await.unwrap_or_default();
     
     render_guest(&req, "Other/Booking", json!({
         "sections": sections,
-        "booking_packages": packages
+        "booking_packages": packages,
+        "booking_categories": categories
     })).into_response()
 }
 
@@ -237,4 +248,90 @@ pub async fn other_sop(State(state): State<AppState>, req: Request) -> impl Into
         "sections": sections,
         "sop_rules": rules
     })).into_response()
+}
+
+#[derive(Deserialize)]
+pub struct PublicBookingRequest {
+    pub name: String,
+    pub email: String,
+    pub whatsapp: String,
+    pub date: String,
+    pub show_type: String,
+    pub details: Option<String>,
+}
+
+impl Validate for PublicBookingRequest {
+    fn validate(&self) -> Result<(), HashMap<String, String>> {
+        let mut errs = HashMap::new();
+        if self.name.trim().is_empty() { errs.insert("name".to_string(), "Nama instansi tidak boleh kosong".to_string()); }
+        if self.email.trim().is_empty() { errs.insert("email".to_string(), "Email tidak boleh kosong".to_string()); }
+        if self.whatsapp.trim().is_empty() { errs.insert("whatsapp".to_string(), "WhatsApp tidak boleh kosong".to_string()); }
+        if self.date.trim().is_empty() { errs.insert("date".to_string(), "Tanggal acara tidak boleh kosong".to_string()); }
+        if self.show_type.trim().is_empty() { errs.insert("show_type".to_string(), "Pilih tipe pementasan".to_string()); }
+        if errs.is_empty() { Ok(()) } else { Err(errs) }
+    }
+}
+
+pub async fn submit_booking_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let data = match req.validate::<PublicBookingRequest>() {
+        Ok(d) => d,
+        Err(_errs) => {
+            req.session.set("error", "Validasi gagal. Mohon periksa isian Anda.");
+            return Redirect::to("/booking").into_response();
+        }
+    };
+
+    let service = BookingRequestService::new(state.db.clone());
+    match service.create_request(data.name, data.email, data.whatsapp, data.date, data.show_type, data.details).await {
+        Ok(_) => {
+            req.session.set("success", "Permintaan Booking berhasil dikirim! Pengurus Sanggar akan segera menghubungi Anda.");
+        }
+        Err(e) => {
+            req.session.set("error", format!("Gagal mengirim permintaan: {}", e));
+        }
+    }
+    Redirect::to("/booking").into_response()
+}
+
+#[derive(Deserialize)]
+pub struct PublicJoinRequest {
+    pub name: String,
+    pub email: String,
+    pub origin: String,
+    pub whatsapp: String,
+    pub class_category: String,
+    pub motivation: Option<String>,
+}
+
+impl Validate for PublicJoinRequest {
+    fn validate(&self) -> Result<(), HashMap<String, String>> {
+        let mut errs = HashMap::new();
+        if self.name.trim().is_empty() { errs.insert("name".to_string(), "Nama lengkap tidak boleh kosong".to_string()); }
+        if self.email.trim().is_empty() { errs.insert("email".to_string(), "Email tidak boleh kosong".to_string()); }
+        if self.origin.trim().is_empty() { errs.insert("origin".to_string(), "Asal daerah tidak boleh kosong".to_string()); }
+        if self.whatsapp.trim().is_empty() { errs.insert("whatsapp".to_string(), "WhatsApp tidak boleh kosong".to_string()); }
+        if self.class_category.trim().is_empty() { errs.insert("class_category".to_string(), "Pilih kategori kelas".to_string()); }
+        if errs.is_empty() { Ok(()) } else { Err(errs) }
+    }
+}
+
+pub async fn submit_join_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    let data = match req.validate::<PublicJoinRequest>() {
+        Ok(d) => d,
+        Err(_errs) => {
+            req.session.set("error", "Validasi gagal. Mohon periksa isian Anda.");
+            return Redirect::to("/join").into_response();
+        }
+    };
+
+    let service = JoinRequestService::new(state.db.clone());
+    match service.create_request(data.name, data.email, data.origin, data.whatsapp, data.class_category, data.motivation).await {
+        Ok(_) => {
+            req.session.set("success", "Pendaftaran berhasil dikirim! Pengurus Sanggar akan segera menghubungi Anda.");
+        }
+        Err(e) => {
+            req.session.set("error", format!("Gagal memproses pendaftaran: {}", e));
+        }
+    }
+    Redirect::to("/join").into_response()
 }
