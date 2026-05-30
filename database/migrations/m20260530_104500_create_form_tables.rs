@@ -20,6 +20,7 @@ impl MigrationTrait for Migration {
             table.string("date").not_null();
             table.string("show_type").not_null();
             table.string("details").nullable();
+            table.integer("status").default(0);
             table.string("created_at").nullable();
             table.string("updated_at").nullable();
         }).await?;
@@ -34,6 +35,7 @@ impl MigrationTrait for Migration {
             table.string("whatsapp").not_null();
             table.string("class_category").not_null();
             table.string("motivation").nullable();
+            table.integer("status").default(0);
             table.string("created_at").nullable();
             table.string("updated_at").nullable();
         }).await?;

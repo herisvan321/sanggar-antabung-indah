@@ -96,10 +96,12 @@ pub fn router() -> Router<AppState> {
         .merge(Router::new().route("/dashboard/contact_infos/:id/delete", post(admin::page_content_controller::PageContentController::delete_contact_info)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_kontak"))));
 
     let booking_request_routes = Router::new()
-        .merge(Router::new().route("/dashboard/booking_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_booking"))));
+        .merge(Router::new().route("/dashboard/booking_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_booking_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_booking"))))
+        .merge(Router::new().route("/dashboard/booking_requests/:id/read", post(admin::page_content_controller::PageContentController::read_booking_request)).layer(from_fn(|req, next| permission_middleware(req, next, "update_booking"))));
 
     let join_request_routes = Router::new()
-        .merge(Router::new().route("/dashboard/join_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_join"))));
+        .merge(Router::new().route("/dashboard/join_requests/:id/delete", post(admin::page_content_controller::PageContentController::delete_join_request)).layer(from_fn(|req, next| permission_middleware(req, next, "delete_join"))))
+        .merge(Router::new().route("/dashboard/join_requests/:id/read", post(admin::page_content_controller::PageContentController::read_join_request)).layer(from_fn(|req, next| permission_middleware(req, next, "update_join"))));
 
     let booking_category_routes = Router::new()
         .merge(Router::new().route("/dashboard/booking_categories", post(admin::page_content_controller::PageContentController::store_booking_category)).layer(from_fn(|req, next| permission_middleware(req, next, "create_booking"))))

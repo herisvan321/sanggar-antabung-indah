@@ -45,6 +45,7 @@ impl BookingRequestService {
             "date": date,
             "show_type": show_type,
             "details": details,
+            "status": 0,
             "created_at": now.clone(),
             "updated_at": now,
         });

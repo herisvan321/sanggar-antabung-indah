@@ -2,7 +2,7 @@ use rustbasic_core::model;
 
 model! {
     table: "join_requests",
-    fillable: [name, email, origin, whatsapp, class_category, motivation, created_at, updated_at],
+    fillable: [name, email, origin, whatsapp, class_category, motivation, status, created_at, updated_at],
     Model {
         pub id: i32,
         pub name: String,
@@ -11,6 +11,7 @@ model! {
         pub whatsapp: String,
         pub class_category: String,
         pub motivation: Option<String>,
+        pub status: Option<i32>,
         pub created_at: Option<String>,
         pub updated_at: Option<String>,
     }

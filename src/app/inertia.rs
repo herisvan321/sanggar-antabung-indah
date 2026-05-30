@@ -51,6 +51,25 @@ pub fn inertia(req: &Request, component: &str, props: Value) -> Response {
         if let Some(s) = settings {
             map.insert("settings".to_string(), s);
         }
+
+        // Fetch counts for unread (status = 0) booking and join requests from database to share globally
+        let (booking_count, join_count) = tokio::task::block_in_place(|| {
+            tokio::runtime::Handle::current().block_on(async {
+                let bc = rustbasic_core::database::DB::table(&db, "booking_requests")
+                    .where_("status", 0)
+                    .count()
+                    .await
+                    .unwrap_or(0);
+                let jc = rustbasic_core::database::DB::table(&db, "join_requests")
+                    .where_("status", 0)
+                    .count()
+                    .await
+                    .unwrap_or(0);
+                (bc, jc)
+            })
+        });
+        map.insert("bookingRequestsCount".to_string(), json!(booking_count));
+        map.insert("joinRequestsCount".to_string(), json!(join_count));
     }
 
     let page_object = json!({

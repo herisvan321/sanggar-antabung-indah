@@ -1017,6 +1017,26 @@ impl PageContentController {
         }
         Redirect::to("/dashboard/pages").into_response()
     }
+
+    // Booking Request mark as read
+    pub async fn read_booking_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let _ = rustbasic_core::sqlx::query("UPDATE booking_requests SET status = 1 WHERE id = ?")
+            .bind(id)
+            .execute(&state.db)
+            .await;
+        Redirect::to("/dashboard/pages").into_response()
+    }
+
+    // Join Request mark as read
+    pub async fn read_join_request(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+        let id: i32 = req.param("id").unwrap_or("0").parse().unwrap_or(0);
+        let _ = rustbasic_core::sqlx::query("UPDATE join_requests SET status = 1 WHERE id = ?")
+            .bind(id)
+            .execute(&state.db)
+            .await;
+        Redirect::to("/dashboard/pages").into_response()
+    }
 }
 
 #[derive(Deserialize)]

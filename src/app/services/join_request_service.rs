@@ -45,6 +45,7 @@ impl JoinRequestService {
             "whatsapp": whatsapp,
             "class_category": class_category,
             "motivation": motivation,
+            "status": 0,
             "created_at": now.clone(),
             "updated_at": now,
         });

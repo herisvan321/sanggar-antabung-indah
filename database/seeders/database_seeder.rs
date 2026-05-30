@@ -890,6 +890,7 @@ seeder! {
                 "date": "2026-06-15",
                 "show_type": "Penyambutan Tamu / Pasambahan",
                 "details": "Pementasan tari pasambahan untuk menyambut kunjungan studi banding kementerian di kantor bupati.",
+                "status": 0,
                 "created_at": now.clone(),
                 "updated_at": now.clone(),
             })).await;
@@ -900,6 +901,7 @@ seeder! {
                 "date": "2026-07-20",
                 "show_type": "Pertunjukan Randai Kolosal",
                 "details": "Pertunjukan randai lakon Anggun Nan Tongga di panggung utama festival rakyat jorong tarok.",
+                "status": 0,
                 "created_at": now.clone(),
                 "updated_at": now.clone(),
             })).await;
@@ -915,6 +917,7 @@ seeder! {
                 "whatsapp": "085299887766",
                 "class_category": "Silek Tradisional Minang",
                 "motivation": "Ingin melestarikan silek tradisional peninggalan nenek moyang dan membela diri.",
+                "status": 0,
                 "created_at": now.clone(),
                 "updated_at": now.clone(),
             })).await;
@@ -925,6 +928,7 @@ seeder! {
                 "whatsapp": "081299881122",
                 "class_category": "Tari Pijak Galeh (Piring)",
                 "motivation": "Sangat tertarik mempelajari kelincahan menari di atas pecahan kaca sejak kecil.",
+                "status": 0,
                 "created_at": now.clone(),
                 "updated_at": now.clone(),
             })).await;

@@ -16,8 +16,10 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
   const { theme, toggleTheme, isDark } = useOtherTheme();
   const [isRbacOpen, setIsRbacOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
   const rbacRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   // Use props from Inertia if not passed directly (useful for persistent layout)
   const displayTitle = title || props.title;
@@ -35,6 +37,9 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
       }
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setIsUserMenuOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -211,6 +216,86 @@ function AdminLayoutContent({ children, title, userName, userEmail }: AdminLayou
             <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden lg:block"></div>
 
             <div className="flex items-center gap-4">
+              {/* Notification Menu (Lonceng Dropdown) */}
+              {(userPermissions.includes('halaman_join') || userPermissions.includes('halaman_booking')) && (
+                <div className="relative" ref={notifRef}>
+                  <button
+                    onClick={() => setIsNotifOpen(!isNotifOpen)}
+                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-white/80 transition-all duration-300 border border-slate-200 dark:border-white/5 relative"
+                    title="Notifikasi Masuk"
+                  >
+                    <i className="fas fa-bell"></i>
+                    {(props.joinRequestsCount > 0 || props.bookingRequestsCount > 0) && (
+                      <span className="absolute top-1.5 right-1.5 w-4 h-4 text-[9px] font-black text-white bg-[#e11d48] rounded-full flex items-center justify-center animate-pulse">
+                        {(props.joinRequestsCount || 0) + (props.bookingRequestsCount || 0)}
+                      </span>
+                    )}
+                  </button>
+
+                  {isNotifOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#111114] border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 z-50">
+                      <div className="p-4 border-b border-slate-100 dark:border-slate-800/65 flex justify-between items-center bg-slate-50 dark:bg-white/[0.02]">
+                        <span className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">Notifikasi Masuk</span>
+                        <span className="text-[10px] font-bold text-[#e11d48] bg-[#e11d48]/10 px-2 py-0.5 rounded-full">
+                          {(props.joinRequestsCount || 0) + (props.bookingRequestsCount || 0)} baru
+                        </span>
+                      </div>
+                      <div className="p-2 flex flex-col gap-1 max-h-64 overflow-y-auto">
+                        {userPermissions.includes('halaman_join') && (
+                          <Link
+                            href="/dashboard/pages"
+                            onClick={() => {
+                              setIsNotifOpen(false);
+                            }}
+                            className="p-3 text-[11px] rounded-xl flex flex-col gap-1 hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-slate-150 dark:hover:border-slate-800 transition-all text-left"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-700 dark:text-white flex items-center gap-1.5">
+                                <i className="fas fa-user-plus text-emerald-500 text-[10px]"></i>
+                                Pendaftaran Join Baru
+                              </span>
+                              {props.joinRequestsCount > 0 && (
+                                <span className="px-1.5 py-0.5 text-[8px] font-black text-white bg-emerald-500 rounded-full">
+                                  {props.joinRequestsCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-light">Terdapat calon sasian baru mendaftar di gelanggang.</span>
+                          </Link>
+                        )}
+                        {userPermissions.includes('halaman_booking') && (
+                          <Link
+                            href="/dashboard/pages"
+                            onClick={() => {
+                              setIsNotifOpen(false);
+                            }}
+                            className="p-3 text-[11px] rounded-xl flex flex-col gap-1 hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-slate-150 dark:hover:border-slate-800 transition-all text-left"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="font-bold text-slate-700 dark:text-white flex items-center gap-1.5">
+                                <i className="fas fa-file-signature text-amber-500 text-[10px]"></i>
+                                Permintaan Booking Baru
+                              </span>
+                              {props.bookingRequestsCount > 0 && (
+                                <span className="px-1.5 py-0.5 text-[8px] font-black text-white bg-amber-500 rounded-full">
+                                  {props.bookingRequestsCount}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[10px] text-slate-400 font-light">Permintaan reservasi pementasan seni baru masuk.</span>
+                          </Link>
+                        )}
+                        {(!props.joinRequestsCount && !props.bookingRequestsCount) && (
+                          <div className="py-6 text-center text-slate-400 text-[10px] italic">
+                            Semua pesan telah dibaca.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Theme Toggle */}
               <button
                 onClick={toggleTheme}

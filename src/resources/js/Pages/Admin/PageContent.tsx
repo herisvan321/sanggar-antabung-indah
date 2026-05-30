@@ -942,7 +942,7 @@ export default function PageContent({
                             </>
                           )}
 
-                           {/* Booking Packages list cells */}
+                          {/* Booking Packages list cells */}
                           {activeCollection === 'booking_packages' && (
                             <>
                               <td className="py-3 px-4 font-bold">{item.name}</td>
@@ -960,7 +960,12 @@ export default function PageContent({
                           {/* Booking Requests list cells */}
                           {activeCollection === 'booking_requests' && (
                             <>
-                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4 font-bold flex items-center gap-2">
+                                {item.name}
+                                {item.status === 0 && (
+                                  <span className="px-1.5 py-0.5 text-[8px] font-black text-white bg-amber-500 rounded uppercase">Baru</span>
+                                )}
+                              </td>
                               <td className="py-3 px-4">{item.email}</td>
                               <td className="py-3 px-4 font-mono text-[10px]">{item.whatsapp}</td>
                               <td className="py-3 px-4 font-mono text-[10px]">{item.date}</td>
@@ -984,7 +989,12 @@ export default function PageContent({
                           {/* Join Requests list cells */}
                           {activeCollection === 'join_requests' && (
                             <>
-                              <td className="py-3 px-4 font-bold">{item.name}</td>
+                              <td className="py-3 px-4 font-bold flex items-center gap-2">
+                                {item.name}
+                                {item.status === 0 && (
+                                  <span className="px-1.5 py-0.5 text-[8px] font-black text-white bg-emerald-500 rounded uppercase">Baru</span>
+                                )}
+                              </td>
                               <td className="py-3 px-4">{item.email || '-'}</td>
                               <td className="py-3 px-4">{item.origin}</td>
                               <td className="py-3 px-4 font-mono text-[10px]">{item.whatsapp}</td>
@@ -1019,6 +1029,11 @@ export default function PageContent({
                                 onClick={() => {
                                   setSelectedRequest(item);
                                   setShowDetailModal(true);
+                                  // Mark as read asynchronous without reloading the whole page
+                                  router.post(`/dashboard/${activeCollection}/${item.id}/read`, {}, {
+                                    preserveScroll: true,
+                                    only: [activeCollection, 'bookingRequestsCount', 'joinRequestsCount']
+                                  });
                                 }}
                                 className="px-2.5 py-1.5 bg-[#e11d48]/10 text-[#e11d48] hover:bg-[#e11d48]/20 rounded-lg text-[10px] font-bold"
                               >
