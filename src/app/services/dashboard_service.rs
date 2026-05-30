@@ -114,6 +114,21 @@ impl DashboardService {
             })
             .collect();
 
+        // Calculate actual average response time from durationMs in logs
+        let mut total_duration = 0;
+        let mut counted_logs = 0;
+        for log_val in &formatted_logs {
+            if let Some(duration) = log_val.get("durationMs").and_then(|d| d.as_i64()) {
+                total_duration += duration;
+                counted_logs += 1;
+            }
+        }
+        let avg_response_time = if counted_logs > 0 {
+            total_duration / counted_logs
+        } else {
+            24 // fallback default
+        };
+
         json!({
             "totalUsers": total_users,
             "totalActivityLogs": total_activity_logs,
@@ -121,6 +136,7 @@ impl DashboardService {
             "activityChart": activity_chart,
             "activityDonut": activity_donut,
             "activityLogs": formatted_logs,
+            "averageResponseTime": avg_response_time,
         })
     }
 }

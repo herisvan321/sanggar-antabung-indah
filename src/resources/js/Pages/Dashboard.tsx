@@ -39,6 +39,7 @@ interface DashboardProps {
   activityDonut?: ActivityDonutPoint[];
   activityLogs?: ActivityLogRow[];
   roles?: string[];
+  averageResponseTime?: number;
 }
 
 const periodLabels: Record<string, string> = {
@@ -111,6 +112,7 @@ export default function Dashboard({
   activityDonut = [],
   activityLogs = [],
   roles = [],
+  averageResponseTime = 24,
 }: DashboardProps) {
   const { isDark } = useOtherTheme();
   const maxActivity = Math.max(1, ...activityChart.map((point) => point.count));
@@ -544,7 +546,7 @@ export default function Dashboard({
           <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-bl-full pointer-events-none transition-all duration-300 group-hover:scale-110"></div>
           <div>
             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest block mb-2">Response Time</span>
-            <span className="font-serif text-5xl font-black text-amber-500">24<span className="text-xl font-normal text-slate-400">ms</span></span>
+            <span className="font-serif text-5xl font-black text-amber-500">{averageResponseTime}<span className="text-xl font-normal text-slate-400">ms</span></span>
           </div>
           <p className="text-xs text-slate-400 mt-4">Rata-rata kecepatan pemrosesan server.</p>
         </div>
