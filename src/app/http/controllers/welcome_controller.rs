@@ -183,6 +183,23 @@ pub async fn other_berita(State(state): State<AppState>, req: Request) -> impl I
     })).into_response()
 }
 
+pub async fn other_berita_detail(State(state): State<AppState>, req: Request) -> impl IntoResponse {
+    if !is_page_active(&state.db, &req, "berita").await {
+        return Redirect::to("/").into_response();
+    }
+    let slug = req.param("slug").unwrap_or_default();
+    let service = ArticleService::new(state.db.clone());
+    
+    match service.get_article_by_slug(&slug).await {
+        Ok(Some(article)) => {
+            render_guest(&req, "Other/BeritaDetail", json!({
+                "article": article
+            })).into_response()
+        }
+        _ => Redirect::to("/berita").into_response()
+    }
+}
+
 pub async fn other_booking(State(state): State<AppState>, req: Request) -> impl IntoResponse {
     if !is_page_active(&state.db, &req, "booking").await {
         return Redirect::to("/").into_response();

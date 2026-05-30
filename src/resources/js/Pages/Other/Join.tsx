@@ -1,8 +1,7 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent } from 'react';
+import { Head } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
 import { useOtherTheme } from '../../Layouts/OtherThemeContext';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface PageSection {
   id: number;
@@ -41,50 +40,17 @@ const defaultPendaftaran: JoinStepItem[] = [
 ];
 
 export default function Join({ sections, join_steps }: JoinProps) {
-  const { isDark, showToast } = useOtherTheme();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const { showToast } = useOtherTheme();
 
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
   };
-
-  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
-  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
 
   const handleFormSubmit = (e: FormEvent) => {
     e.preventDefault();
     showToast('Pendaftaran Berhasil! Pengurus Sanggar akan menghubungi Anda via WhatsApp.');
     (e.target as HTMLFormElement).reset();
   };
-
-  if (isLoading || !sections) {
-    return (
-      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
-        <div className="space-y-12 animate-fade-in">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
-            <Skeleton height={20} width="20%" className="mx-auto" />
-            <Skeleton height={40} width="60%" className="mx-auto" />
-            <Skeleton height={24} width="85%" className="mx-auto" />
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-7 p-6 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
-              <Skeleton height={28} width="40%" />
-              <Skeleton height={40} count={3} />
-            </div>
-            <div className="lg:col-span-5 p-6 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
-              <Skeleton height={28} width="40%" />
-              <Skeleton height={60} count={3} />
-            </div>
-          </div>
-        </div>
-      </SkeletonTheme>
-    );
-  }
 
   // Parse Sections
   const headerSec = getSection('header');
@@ -101,92 +67,101 @@ export default function Join({ sections, join_steps }: JoinProps) {
   const pendaftaranList = rawPendaftaran.length > 0 ? rawPendaftaran : defaultPendaftaran;
 
   return (
-    <div className="space-y-12 animate-fade-in">
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <span className="inline-block px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-sm font-bold uppercase tracking-wider rounded-full">Penerimaan Anggota</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
-          {headerTitle.includes('\n') ? (
-            <>
-              {headerTitle.split('\n')[0]} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
-            </>
-          ) : (
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
-          )}
-        </h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
-      </div>
+    <>
+      <Head>
+        <title>Pendaftaran Sasian (Anggota Baru) - Sanggar Antabung Indah</title>
+        <meta name="description" content={headerSub} />
+        <meta property="og:title" content="Pendaftaran Sasian (Anggota Baru) - Sanggar Antabung Indah" />
+        <meta property="og:description" content={headerSub} />
+      </Head>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Registration Form Card */}
-        <div className="lg:col-span-7 p-6 sm:p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
-          <h3 className="font-serif text-2xl font-bold text-slate-800 dark:text-white">{pendaftaranSec?.title || "Formulir Pendaftaran Online"}</h3>
-          
-          {/* Steps description */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-            {pendaftaranList.map((item, idx) => (
-              <div key={item.id || idx} className="p-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-none rounded-xl space-y-1">
-                <span className="text-[10px] font-bold text-[#e11d48] uppercase tracking-wider">Langkah {item.step || idx+1}</span>
-                <h4 className="text-xs font-bold text-slate-800 dark:text-white leading-tight">{item.title || "Langkah Baru"}</h4>
-                <p className="text-[10px] text-slate-500 dark:text-white/40 leading-tight font-light">{item.description}</p>
-              </div>
-            ))}
-          </div>
+      <div className="space-y-12 animate-fade-in">
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto space-y-4">
+          <span className="inline-block px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-sm font-bold uppercase tracking-wider rounded-full">Penerimaan Anggota</span>
+          <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
+            {headerTitle.includes('\n') ? (
+              <>
+                {headerTitle.split('\n')[0]} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
+              </>
+            ) : (
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
+            )}
+          </h2>
+          <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
+        </div>
 
-          <form onSubmit={handleFormSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nama Lengkap</label>
-                <input type="text" required placeholder="Contoh: Rajo Diwangso" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Asal Daerah (Kecamatan/Nagari)</label>
-                <input type="text" required placeholder="Contoh: Sisawah, Sumpur Kudus" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
-              </div>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Registration Form Card */}
+          <div className="lg:col-span-7 p-6 sm:p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+            <h3 className="font-serif text-2xl font-bold text-slate-800 dark:text-white">{pendaftaranSec?.title || "Formulir Pendaftaran Online"}</h3>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nomor WhatsApp</label>
-                <input type="tel" required placeholder="0812XXXXXXXX" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
-              </div>
-              <div className="space-y-1">
-                <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Kategori Kelas Utama</label>
-                <select className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300">
-                  <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemain Randai / Aktor</option>
-                  <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Silek Tradisional Minang</option>
-                  <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemusik (Talempong/Rabab)</option>
-                  <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Tari Pijak Galeh (Piring)</option>
-                </select>
-              </div>
+            {/* Steps description */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+              {pendaftaranList.map((item, idx) => (
+                <div key={item.id || idx} className="p-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-none rounded-xl space-y-1">
+                  <span className="text-[10px] font-bold text-[#e11d48] uppercase tracking-wider">Langkah {item.step || idx+1}</span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white leading-tight">{item.title || "Langkah Baru"}</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-white/40 leading-tight font-light">{item.description}</p>
+                </div>
+              ))}
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Motivasi Bergabung</label>
-              <textarea rows={3} placeholder="Ceritakan ketertarikan Anda bersama kami..." className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300"></textarea>
-            </div>
-
-            <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#e11d48] to-[#fbbf24] text-white text-sm font-bold rounded-xl hover:brightness-115 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#e11d48]/20">
-              Kirim Berkas Pendaftaran
-            </button>
-          </form>
-        </div>
-
-        {/* Requirements Column */}
-        <div className="lg:col-span-5 p-6 sm:p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
-          <h3 className="font-serif text-2xl font-bold text-slate-800 dark:text-white">{syaratSec?.title || "Persyaratan Anggota"}</h3>
-          <div className="space-y-3">
-            {syaratList.map((b, idx) => (
-              <div key={b.id || idx} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
-                <span className="w-6 h-6 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center shrink-0 text-sm font-bold">{idx + 1}</span>
-                <span className="text-sm text-slate-600 dark:text-white/70 font-light leading-relaxed">{b.description}</span>
+            <form onSubmit={handleFormSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nama Lengkap</label>
+                  <input type="text" required placeholder="Contoh: Rajo Diwangso" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Asal Daerah (Kecamatan/Nagari)</label>
+                  <input type="text" required placeholder="Contoh: Sisawah, Sumpur Kudus" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                </div>
               </div>
-            ))}
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Nomor WhatsApp</label>
+                  <input type="tel" required placeholder="0812XXXXXXXX" className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Kategori Kelas Utama</label>
+                  <select className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-650 dark:text-white/70 focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300">
+                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemain Randai / Aktor</option>
+                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Silek Tradisional Minang</option>
+                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Pemusik (Talempong/Rabab)</option>
+                    <option className="bg-white dark:bg-[#141417] text-slate-800 dark:text-white">Tari Pijak Galeh (Piring)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[10px] text-slate-500 dark:text-white/50 font-bold uppercase">Motivasi Bergabung</label>
+                <textarea rows={3} placeholder="Ceritakan ketertarikan Anda bersama kami..." className="w-full px-4 py-3 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-white focus:outline-none focus:border-[#e11d48] text-sm transition-colors duration-300"></textarea>
+              </div>
+
+              <button type="submit" className="w-full py-4 bg-gradient-to-r from-[#e11d48] to-[#fbbf24] text-white text-sm font-bold rounded-xl hover:brightness-115 active:scale-[0.98] transition-all duration-300 uppercase tracking-widest shadow-lg shadow-[#e11d48]/20">
+                Kirim Berkas Pendaftaran
+              </button>
+            </form>
+          </div>
+
+          {/* Requirements Column */}
+          <div className="lg:col-span-5 p-6 sm:p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+            <h3 className="font-serif text-2xl font-bold text-slate-800 dark:text-white">{syaratSec?.title || "Persyaratan Anggota"}</h3>
+            <div className="space-y-3">
+              {syaratList.map((b, idx) => (
+                <div key={b.id || idx} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/60 dark:border-white/5">
+                  <span className="w-6 h-6 rounded-lg bg-[#10b981]/20 text-[#10b981] flex items-center justify-center shrink-0 text-sm font-bold">{idx + 1}</span>
+                  <span className="text-sm text-slate-600 dark:text-white/70 font-light leading-relaxed">{b.description}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

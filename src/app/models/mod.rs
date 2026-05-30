@@ -35,3 +35,7 @@ pub mod join_step;
 pub mod booking_package;
 pub mod sop_rule;
 pub mod contact_info;
+pub mod booking_request;
+pub mod join_request;
+pub mod booking_category;
+pub mod join_category;

@@ -136,6 +136,7 @@ pub fn router() -> Router<AppState> {
         .route("/program", get(welcome_controller::other_program))
         .route("/join", get(welcome_controller::other_join))
         .route("/berita", get(welcome_controller::other_berita))
+        .route("/berita/:slug", get(welcome_controller::other_berita_detail))
         .route("/booking", get(welcome_controller::other_booking))
         .route("/kontak", get(welcome_controller::other_kontak))
         .route("/sop", get(welcome_controller::other_sop))

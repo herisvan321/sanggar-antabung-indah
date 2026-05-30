@@ -1,9 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { Link, Head } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
-import { useOtherTheme } from '../../Layouts/OtherThemeContext';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface PageSection {
   id: number;
@@ -42,44 +38,9 @@ const defaultPertunjukan: ScheduleItem[] = [
 ];
 
 export default function Jadwal({ sections, schedules }: JadwalProps) {
-  const { isDark } = useOtherTheme();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
   };
-
-  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
-  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
-
-  if (isLoading || !sections) {
-    return (
-      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
-        <div className="space-y-12 animate-fade-in">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
-            <Skeleton height={20} width="20%" className="mx-auto" />
-            <Skeleton height={40} width="60%" className="mx-auto" />
-            <Skeleton height={24} width="85%" className="mx-auto" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
-              <Skeleton height={28} width="40%" />
-              <Skeleton height={80} count={2} />
-            </div>
-            <div className="p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
-              <Skeleton height={28} width="40%" />
-              <Skeleton height={80} count={2} />
-            </div>
-          </div>
-        </div>
-      </SkeletonTheme>
-    );
-  }
 
   // Parse Sections
   const headerSec = getSection('header');
@@ -96,67 +57,76 @@ export default function Jadwal({ sections, schedules }: JadwalProps) {
   const pertunjukanList = rawPertunjukan.length > 0 ? rawPertunjukan : defaultPertunjukan;
 
   return (
-    <div className="space-y-12 animate-fade-in">
-      {/* Header */}
-      <div className="text-center max-w-2xl mx-auto space-y-4">
-        <span className="inline-block px-3 py-1 bg-[#e11d48]/10 text-[#e11d48] text-sm font-bold uppercase tracking-wider rounded-full">Agenda Seni</span>
-        <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
-          {headerTitle.includes('\n') ? (
-            <>
-              {headerTitle.split('\n')[0]} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
-            </>
-          ) : (
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
-          )}
-        </h2>
-        <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
-      </div>
+    <>
+      <Head>
+        <title>Jadwal Kegiatan & Latihan - Sanggar Antabung Indah</title>
+        <meta name="description" content={headerSub} />
+        <meta property="og:title" content="Jadwal Kegiatan & Latihan - Sanggar Antabung Indah" />
+        <meta property="og:description" content={headerSub} />
+      </Head>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
-        {/* Latihan Card */}
-        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
-          <span className="text-[#10b981] text-base font-bold uppercase tracking-widest block">
-            <i className="fas fa-calendar-alt mr-2"></i> {latihanSec?.title || "Jadwal Latihan Mingguan"}
-          </span>
-          <div className="space-y-4">
-            {latihanList.map((item, idx) => (
-              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-black text-slate-800 dark:text-white">{item.date}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 bg-[#10b981]/10 text-[#10b981] rounded-md">{item.time || "N/A"}</span>
-                </div>
-                <h4 className="text-sm font-bold text-[#e11d48]">{item.activity || item.title}</h4>
-                <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
-              </div>
-            ))}
-          </div>
+      <div className="space-y-12 animate-fade-in">
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto space-y-4">
+          <span className="inline-block px-3 py-1 bg-[#e11d48]/10 text-[#e11d48] text-sm font-bold uppercase tracking-wider rounded-full">Agenda Seni</span>
+          <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
+            {headerTitle.includes('\n') ? (
+              <>
+                {headerTitle.split('\n')[0]} <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle.split('\n')[1]}</span>
+              </>
+            ) : (
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e11d48] to-[#fbbf24]">{headerTitle}</span>
+            )}
+          </h2>
+          <p className="text-slate-600 dark:text-white/60 font-light text-base">{headerSub}</p>
         </div>
 
-        {/* Pertunjukan Card */}
-        <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
-          <span className="text-[#fbbf24] text-base font-bold uppercase tracking-widest block">
-            <i className="fas fa-bullhorn mr-2"></i> {pertunjukanSec?.title || "Pementasan Besar Terdekat"}
-          </span>
-          <div className="space-y-4">
-            {pertunjukanList.map((item, idx) => (
-              <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-black text-slate-800 dark:text-white">{item.title}</span>
-                  <span className="text-xs font-semibold px-2 py-0.5 bg-[#fbbf24]/10 text-[#d97706] dark:text-[#fbbf24] rounded-md">{item.date}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* Latihan Card */}
+          <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+            <span className="text-[#10b981] text-base font-bold uppercase tracking-widest block">
+              <i className="fas fa-calendar-alt mr-2"></i> {latihanSec?.title || "Jadwal Latihan Mingguan"}
+            </span>
+            <div className="space-y-4">
+              {latihanList.map((item, idx) => (
+                <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-black text-slate-800 dark:text-white">{item.date}</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 bg-[#10b981]/10 text-[#10b981] rounded-md">{item.time || "N/A"}</span>
+                  </div>
+                  <h4 className="text-sm font-bold text-[#e11d48]">{item.activity || item.title}</h4>
+                  <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-          <Link href="/booking" className="block text-center w-full py-4 bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold rounded-xl transition-all duration-300 uppercase tracking-widest">
-            Booking Pentas / Hubungi Kami
-          </Link>
-        </div>
 
+          {/* Pertunjukan Card */}
+          <div className="p-8 sm:p-12 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 shadow-md dark:shadow-none space-y-6">
+            <span className="text-[#fbbf24] text-base font-bold uppercase tracking-widest block">
+              <i className="fas fa-bullhorn mr-2"></i> {pertunjukanSec?.title || "Pementasan Besar Terdekat"}
+            </span>
+            <div className="space-y-4">
+              {pertunjukanList.map((item, idx) => (
+                <div key={item.id || idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-black text-slate-800 dark:text-white">{item.title}</span>
+                    <span className="text-xs font-semibold px-2 py-0.5 bg-[#fbbf24]/10 text-[#d97706] dark:text-[#fbbf24] rounded-md">{item.date}</span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-white/40"><i className="fas fa-map-marker-alt mr-1"></i> {item.place}</p>
+                </div>
+              ))}
+            </div>
+            <Link href="/booking" className="block text-center w-full py-4 bg-[#e11d48] hover:bg-[#be123c] text-white text-xs font-bold rounded-xl transition-all duration-300 uppercase tracking-widest">
+              Booking Pentas / Hubungi Kami
+            </Link>
+          </div>
+
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

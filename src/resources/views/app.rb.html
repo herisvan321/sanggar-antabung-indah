@@ -3,11 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="RustBasic - Framework web full-stack modern berkinerja tinggi berbasis Rust (Custom HTTP Engine) dan React.js">
-    <meta name="keywords" content="rust, rustbasic, web framework, react, inertia, spa, web development">
-    <meta name="author" content="RustBasic">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <title>RustBasic - React + Inertia SPA</title>
+    
+    {% if page.props.settings %}
+    <meta name="description" content="{{ page.props.settings.meta_description }}">
+    <meta name="keywords" content="sanggar antabung indah, ngalau antabuang, randai sisawah, tari pijak galeh, talempong ungah, kesenian sijunjung, sumpur kudus, sumatera barat">
+    <meta name="author" content="{{ page.props.settings.app_name }}">
+    <title>{{ page.props.settings.meta_title }}</title>
+    {% else %}
+    <meta name="description" content="Sanggar Antabung Indah - Digitalisasi Kesenian Randai, Tari Pijak Galeh, dan Musik Talempong Ungah khas Kenagarian Sisawah, Sumpur Kudus, Sijunjung.">
+    <meta name="keywords" content="sanggar antabung indah, ngalau antabuang, randai sisawah, tari pijak galeh, talempong ungah, kesenian sijunjung, sumpur kudus, sumatera barat">
+    <meta name="author" content="Sanggar Antabung Indah">
+    <title>Sanggar Antabung Indah | Pelestarian Seni Nagari Sisawah Sijunjung</title>
+    {% endif %}
+
+    <!-- Open Graph / Facebook / LinkedIn -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% if page.props.settings %}{{ page.props.settings.meta_title }}{% else %}Sanggar Antabung Indah | Pelestarian Seni Nagari Sisawah Sijunjung{% endif %}">
+    <meta property="og:description" content="{% if page.props.settings %}{{ page.props.settings.meta_description }}{% else %}Sanggar Antabung Indah - Digitalisasi Kesenian Randai, Tari Pijak Galeh, dan Musik Talempong Ungah khas Kenagarian Sisawah, Sumpur Kudus, Sijunjung.{% endif %}">
+    <meta property="og:image" content="/favicon.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="{% if page.props.settings %}{{ page.props.settings.meta_title }}{% else %}Sanggar Antabung Indah | Pelestarian Seni Nagari Sisawah Sijunjung{% endif %}">
+    <meta property="twitter:description" content="{% if page.props.settings %}{{ page.props.settings.meta_description }}{% else %}Sanggar Antabung Indah - Digitalisasi Kesenian Randai, Tari Pijak Galeh, dan Musik Talempong Ungah khas Kenagarian Sisawah, Sumpur Kudus, Sijunjung.{% endif %}">
+    <meta property="twitter:image" content="/favicon.png">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">

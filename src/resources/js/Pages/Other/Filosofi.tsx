@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react';
+import { Head } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
-import { useOtherTheme } from '../../Layouts/OtherThemeContext';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface PageSection {
   id: number;
@@ -28,43 +25,9 @@ const defaultFilosofi = [
 ];
 
 export default function Filosofi({ sections, philosophical_values }: FilosofiProps) {
-  const { isDark } = useOtherTheme();
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
   };
-
-  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
-  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
-
-  if (isLoading || !sections) {
-    return (
-      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
-        <div className="space-y-12 animate-fade-in">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
-            <Skeleton height={20} width="20%" className="mx-auto" />
-            <Skeleton height={40} width="60%" className="mx-auto" />
-            <Skeleton height={24} width="85%" className="mx-auto" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(idx => (
-              <div key={idx} className="p-6 rounded-3xl bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 space-y-4">
-                <Skeleton height={20} width="30%" />
-                <Skeleton height={24} width="70%" />
-                <Skeleton count={3} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </SkeletonTheme>
-    );
-  }
 
   // Parse Sections
   const headerSec = getSection('header');
@@ -77,7 +40,15 @@ export default function Filosofi({ sections, philosophical_values }: FilosofiPro
     : defaultFilosofi;
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <>
+      <Head>
+        <title>Filosofi & Nilai Kesenian - Sanggar Antabung Indah</title>
+        <meta name="description" content={headerSub} />
+        <meta property="og:title" content="Filosofi & Nilai Kesenian - Sanggar Antabung Indah" />
+        <meta property="og:description" content={headerSub} />
+      </Head>
+
+      <div className="space-y-12 animate-fade-in text-slate-800 dark:text-white">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#fbbf24]/10 text-[#d97706] dark:text-[#fbbf24] text-sm font-bold uppercase tracking-wider rounded-full">Filosofi Seni</span>
@@ -113,6 +84,7 @@ export default function Filosofi({ sections, philosophical_values }: FilosofiPro
         ))}
       </div>
     </div>
+    </>
   );
 }
 

@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
-import { useOtherTheme } from '../../Layouts/OtherThemeContext';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface PageSection {
   id: number;
@@ -32,8 +30,6 @@ const defaultImages = [
 ];
 
 export default function Galeri({ sections, galleries }: GaleriProps) {
-  const { isDark } = useOtherTheme();
-  const [isLoading, setIsLoading] = useState(true);
   const [galleryFilter, setGalleryFilter] = useState<'all' | 'pementasan' | 'latihan' | 'adat' | 'alam' | string>('all');
 
   // Lightbox State
@@ -41,41 +37,9 @@ export default function Galeri({ sections, galleries }: GaleriProps) {
   const [lightboxImage, setLightboxImage] = useState('');
   const [lightboxCaption, setLightboxCaption] = useState('');
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
   };
-
-  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
-  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
-
-  if (isLoading || !sections) {
-    return (
-      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
-        <div className="space-y-12 animate-fade-in">
-          <div className="text-center max-w-2xl mx-auto space-y-4">
-            <Skeleton height={20} width="20%" className="mx-auto" />
-            <Skeleton height={40} width="60%" className="mx-auto" />
-            <Skeleton height={24} width="85%" className="mx-auto" />
-          </div>
-          <div className="flex flex-wrap justify-center gap-3">
-            {[1, 2, 3, 4, 5].map(idx => (
-              <Skeleton key={idx} height={40} width={120} borderRadius={12} />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map(idx => (
-              <Skeleton key={idx} height={256} borderRadius={16} />
-            ))}
-          </div>
-        </div>
-      </SkeletonTheme>
-    );
-  }
 
   // Parse Header
   const headerSec = getSection('header');
@@ -87,7 +51,15 @@ export default function Galeri({ sections, galleries }: GaleriProps) {
     : defaultImages;
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <>
+      <Head>
+        <title>Galeri Dokumentasi & Foto Kegiatan - Sanggar Antabung Indah</title>
+        <meta name="description" content={headerSub} />
+        <meta property="og:title" content="Galeri Dokumentasi & Foto Kegiatan - Sanggar Antabung Indah" />
+        <meta property="og:description" content={headerSub} />
+      </Head>
+
+      <div className="space-y-12 animate-fade-in text-slate-800 dark:text-white">
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <span className="inline-block px-3 py-1 bg-[#10b981]/10 text-[#10b981] text-sm font-bold uppercase tracking-wider rounded-full">Koleksi Visual</span>
         <h2 className="font-serif text-4xl sm:text-5xl font-black whitespace-pre-line">
@@ -170,6 +142,7 @@ export default function Galeri({ sections, galleries }: GaleriProps) {
         </div>
       )}
     </div>
+    </>
   );
 }
 

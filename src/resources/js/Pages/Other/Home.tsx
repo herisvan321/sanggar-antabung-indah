@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Link } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { Link, Head } from '@inertiajs/react';
 import { useOtherTheme } from '../../Layouts/OtherThemeContext';
 import { getOtherLayout } from '../../Layouts/OtherLayouts';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
-import 'react-loading-skeleton/dist/skeleton.css';
 
 interface HomeSection {
   id: number;
@@ -36,57 +34,15 @@ const defaultServices = [
 ];
 
 export default function Home({ sections, metrics, programs, schedules }: HomeProps) {
-  const { showToast, isDark } = useOtherTheme();
-  const [isLoading, setIsLoading] = useState(true);
+  const { showToast } = useOtherTheme();
 
   useEffect(() => {
     showToast("Selamat datang di Sanggar Antabung Indah Nagari Sisawah!");
-    // Simulate initial loading to showcase skeleton loaders
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
   }, []);
 
   const getSection = (key: string) => {
     return sections?.find(s => s.section_key === key);
   };
-
-  // Skeleton Colors based on dark/light mode
-  const skeletonBaseColor = isDark ? '#1e293b' : '#e2e8f0';
-  const skeletonHighlightColor = isDark ? '#334155' : '#f1f5f9';
-
-  if (isLoading || !sections) {
-    return (
-      <SkeletonTheme baseColor={skeletonBaseColor} highlightColor={skeletonHighlightColor}>
-        <div className="space-y-12 animate-fade-in">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            <div className="lg:col-span-7 p-8 sm:p-12 rounded-[36px] bg-slate-900 border border-slate-800 text-white min-h-[500px] flex flex-col justify-between">
-              <div className="space-y-6">
-                <Skeleton height={50} width="60%" />
-                <Skeleton height={30} width="85%" />
-                <Skeleton count={3} />
-              </div>
-              <div className="flex flex-wrap gap-4 mt-8">
-                <Skeleton height={48} width={180} borderRadius={12} />
-                <Skeleton height={48} width={180} borderRadius={12} />
-              </div>
-            </div>
-            <div className="lg:col-span-5 p-6 rounded-[36px] bg-slate-950 border border-slate-900 min-h-[500px] flex flex-col justify-between">
-              <Skeleton height={28} width="40%" />
-              <div className="my-4">
-                <Skeleton height={220} borderRadius={16} />
-              </div>
-              <Skeleton height={40} borderRadius={12} />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-4">
-            <div className="lg:col-span-4 p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 min-h-[220px]"><Skeleton count={4} /></div>
-            <div className="lg:col-span-4 p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 min-h-[220px]"><Skeleton count={4} /></div>
-            <div className="lg:col-span-4 p-8 rounded-[32px] bg-white dark:bg-[#141417]/80 border border-slate-200 dark:border-white/5 min-h-[220px]"><Skeleton count={4} /></div>
-          </div>
-        </div>
-      </SkeletonTheme>
-    );
-  }
 
   // Parse Section: Hero
   const heroSec = getSection('hero');
@@ -153,7 +109,15 @@ export default function Home({ sections, metrics, programs, schedules }: HomePro
   ];
 
   return (
-    <div className="space-y-12 animate-fade-in">
+    <>
+      <Head>
+        <title>Sanggar Antabung Indah | Pelestarian Seni Nagari Sisawah Sijunjung</title>
+        <meta name="description" content={heroSubtitle} />
+        <meta property="og:title" content="Sanggar Antabung Indah | Pelestarian Seni Nagari Sisawah Sijunjung" />
+        <meta property="og:description" content={heroSubtitle} />
+      </Head>
+
+      <div className="space-y-12 animate-fade-in">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         
         {/* Hero Content Card */}
@@ -345,6 +309,7 @@ export default function Home({ sections, metrics, programs, schedules }: HomePro
         </div>
       </div>
     </div>
+    </>
   );
 }
 
